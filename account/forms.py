@@ -18,3 +18,4 @@ class RegistrationForm(forms.ModelForm):
         if cd['password'] != cd['password_confirm']:
             raise forms.ValidationError("两次输入密码不匹配！请重新输密码！")
         return cd['password_confirm']
+
