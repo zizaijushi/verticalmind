@@ -1,0 +1,12 @@
+{% extends 'base_market.html' %}
+
+{% block title %}退出登录{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row text-center vertical-middle-sm">
+        <p>退出成功！</p>
+        <p>可在此处重新<a href="{% url 'account:user_login' %}">登录</a></p>
+    </div>
+</div>
+{% endblock %}

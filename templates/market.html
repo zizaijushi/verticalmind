@@ -1,0 +1,417 @@
+{% extends "base_market.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <nav class="nav d-flex justify-content-between">
+            <a class="p-2 text-muted" href="{% url 'market:index' %}">首页</a>
+            <a class="p-2 text-muted" href="{% url 'market:market' %}">短期波动</a>
+            <a class="p-2 text-muted" href="#">中期趋势</a>
+            <a class="p-2 text-muted" href="#">长期价值</a>
+            <!--<a class="p-2 text-muted" href="#">估值</a>-->
+            <!--<a class="p-2 text-muted" href="#">宏观</a>-->
+            <!--<a class="p-2 text-muted" href="#">其他市场</a>-->
+            <!--<a class="p-2 text-muted" href="#">量化</a>-->
+            <!--<a class="p-2 text-muted" href="#">内部</a>-->
+        </nav>
+    </div>
+    <main role="main" class="container">
+        <br>
+        <div class="row" id="block-nav">
+            <nav aria-label="breadcrumb" class="col">
+                <ol class="breadcrumb bg-white">
+                    <li class="breadcrumb-item"><a href="{% url 'market:index' %}">首页</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">短期波动</li>
+                </ol>
+            </nav>
+            <div class="custom-switch custom-switch-label col-2 offset-2 d-inline">
+                <input class="custom-switch-input" id="show-sig" type="checkbox">
+                <label class="custom-switch-btn" for="show-sig"></label>
+                <div class="custom-switch-content-checked">仅显示异动数据</div>
+                <div class="custom-switch-content-unchecked">显示全部可选数据</div>
+            </div>
+        </div>
+        <div class="row" id="market">
+            <div class="col-2" >
+                <nav class="navbar navbar-light bg-light" id="sider-nav">
+                    <nav class="nav nav-pills flex-column">
+                        <a class="nav-link" href="#stock-market">股市波动</a>
+                        <nav class="nav nav-pills flex-column">
+                            <a class="nav-link ml-3 my-1" href="#sensitivty">市场情绪</a>
+                            <a class="nav-link ml-3 my-1" href="#volatility">市场波动</a>
+                            <a class="nav-link ml-3 my-1" href="#turnover">市场热度</a>
+                            <a class="nav-link ml-3 my-1" href="#style">市场风格</a>
+                        </nav>
+                        <a class="nav-link" href="#other-market">其他市场</a>
+                        <nav class="nav nav-pills flex-column">
+                            <a class="nav-link ml-3 my-1" href="#future">商品/债期</a>
+                            <a class="nav-link ml-3 my-1" href="#over-night">隔夜利率</a>
+                            <a class="nav-link ml-3 my-1" href="#rate-spread">利差</a>
+                        </nav>
+                        <a class="nav-link" href="#oversea">其他市场</a>
+                        <nav class="nav nav-pills flex-column">
+                            <a class="nav-link ml-3 my-1" href="#etf-net-flow">ETF资金流</a>
+                        </nav>
+                    </nav>
+                </nav>
+            </div>
+            <div class="col-10" id="market-content" >
+                <!--stock market data-->
+                <section class="botton-line" id="stock-market">
+                    <h3>股市波动</h3>
+                    <p>
+                        观察A股市场短期波动，从情绪、收益、热度和风格四个方面展现当前市场的状态。
+                    </p>
+                    <h4 id="sensitivty">市场情绪</h4>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="collapse" id="obos-head">
+                                <div class="bg-light p-4">
+                                    <div class="row">
+                                        <div class="col-12"><h5 class="text-dark">指数/因子超买超卖</h5></div>
+                                        <div class="col-12"><span class="text-muted">超买超卖指当前板块个股相对50日均线的上涨比例</span></div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="btn-group dropright" role="group">
+                                                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    选择板块
+                                                </button>
+                                                <div class="dropdown-menu" id="obos-dropdown">
+                                                    {% for obos in obos_code %}
+                                                    <a class="dropdown-item obos-choose" href="#" id="{{obos.TRADE_CODE}}">{{obos.TRADE_CODE}}</a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <nav class="navbar navbar-light bg-light">
+                                <div class="row">
+                                    <div class="col">
+                                        <button class="btn btn-outline-primary" type="button" data-toggle="collapse" data-target="#obos-head" aria-controls="obos-head" aria-expanded="false" aria-label="Toggle navigation">
+                                            <!--<span class="navbar-toggler-icon"></span>-->
+                                            点击查看详情...
+                                        </button>
+                                    </div>
+                                </div>
+                            </nav>
+                            <div class="hc-chart obos-chart" id="obos-chart"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="collapse" id="amt-head">
+                                <div class="bg-light p-4">
+                                    <div class="row">
+                                        <div class="col-12"><h5 class="text-dark">指数/因子/行业成交额</h5></div>
+                                        <div class="col-12"><span class="text-muted">展示板块成交额20日均值</span></div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="btn-group dropright" role="group">
+                                                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    选择板块
+                                                </button>
+                                                <div class="dropdown-menu" id="amt-dropdown"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <nav class="navbar navbar-light bg-light">
+                                <div class="row">
+                                    <div class="col">
+                                        <button class="btn btn-outline-primary" type="button" data-toggle="collapse" data-target="#amt-head" aria-controls="amt-head"
+                                                aria-expanded="false" aria-label="Toggle navigation">
+                                            点击查看详情...
+                                        </button>
+                                    </div>
+                                </div>
+                            </nav>
+                            <div class="hc-chart" id="amt-chart"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>指数/因子/行业成分股涨跌</h5>
+                            <div class="hc-chart" id="daily-change-chart"></div>
+                        </div>
+                        <div class="col-6">
+                            <h5>其他市场指标</h5>
+                            <div class="hc-chart" id="stracture-fund-chart"></div>
+                        </div>
+                    </div>
+                    <h4 id="volatility">市场波动</h4>
+                    <div class="row">
+                        <div class="col-12">
+                            <table id="volatility-table" class="display" style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Office</th>
+                                    <th>Age</th>
+                                    <th>Start date</th>
+                                    <th>Salary</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Tiger Nixon</td>
+                                    <td>System Architect</td>
+                                    <td>Edinburgh</td>
+                                    <td>61</td>
+                                    <td>2011/04/25</td>
+                                    <td>$320,800</td>
+                                </tr>
+                                <tr>
+                                    <td>Garrett Winters</td>
+                                    <td>Accountant</td>
+                                    <td>Tokyo</td>
+                                    <td>63</td>
+                                    <td>2011/07/25</td>
+                                    <td>$170,750</td>
+                                </tr>
+                                <tr>
+                                    <td>Ashton Cox</td>
+                                    <td>Junior Technical Author</td>
+                                    <td>San Francisco</td>
+                                    <td>66</td>
+                                    <td>2009/01/12</td>
+                                    <td>$86,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Cedric Kelly</td>
+                                    <td>Senior Javascript Developer</td>
+                                    <td>Edinburgh</td>
+                                    <td>22</td>
+                                    <td>2012/03/29</td>
+                                    <td>$433,060</td>
+                                </tr>
+                                <tr>
+                                    <td>Airi Satou</td>
+                                    <td>Accountant</td>
+                                    <td>Tokyo</td>
+                                    <td>33</td>
+                                    <td>2008/11/28</td>
+                                    <td>$162,700</td>
+                                </tr>
+                                <tr>
+                                    <td>Tiger Nixon</td>
+                                    <td>System Architect</td>
+                                    <td>Edinburgh</td>
+                                    <td>61</td>
+                                    <td>2011/04/25</td>
+                                    <td>$320,800</td>
+                                </tr>
+                                <tr>
+                                    <td>Garrett Winters</td>
+                                    <td>Accountant</td>
+                                    <td>Tokyo</td>
+                                    <td>63</td>
+                                    <td>2011/07/25</td>
+                                    <td>$170,750</td>
+                                </tr>
+                                <tr>
+                                    <td>Ashton Cox</td>
+                                    <td>Junior Technical Author</td>
+                                    <td>San Francisco</td>
+                                    <td>66</td>
+                                    <td>2009/01/12</td>
+                                    <td>$86,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Cedric Kelly</td>
+                                    <td>Senior Javascript Developer</td>
+                                    <td>Edinburgh</td>
+                                    <td>22</td>
+                                    <td>2012/03/29</td>
+                                    <td>$433,060</td>
+                                </tr>
+                                <tr>
+                                    <td>Airi Satou</td>
+                                    <td>Accountant</td>
+                                    <td>Tokyo</td>
+                                    <td>33</td>
+                                    <td>2008/11/28</td>
+                                    <td>$162,700</td>
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Office</th>
+                                    <th>Age</th>
+                                    <th>Start date</th>
+                                    <th>Salary</th>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <h4 id="turnover">市场热度</h4>
+                    <div class="row">
+                        <div class="col-12">
+                            <table id="turnover-table" class="display" style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Office</th>
+                                    <th>Age</th>
+                                    <th>Start date</th>
+                                    <th>Salary</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Tiger Nixon</td>
+                                    <td>System Architect</td>
+                                    <td>Edinburgh</td>
+                                    <td>61</td>
+                                    <td>2011/04/25</td>
+                                    <td>$320,800</td>
+                                </tr>
+                                <tr>
+                                    <td>Garrett Winters</td>
+                                    <td>Accountant</td>
+                                    <td>Tokyo</td>
+                                    <td>63</td>
+                                    <td>2011/07/25</td>
+                                    <td>$170,750</td>
+                                </tr>
+                                <tr>
+                                    <td>Ashton Cox</td>
+                                    <td>Junior Technical Author</td>
+                                    <td>San Francisco</td>
+                                    <td>66</td>
+                                    <td>2009/01/12</td>
+                                    <td>$86,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Cedric Kelly</td>
+                                    <td>Senior Javascript Developer</td>
+                                    <td>Edinburgh</td>
+                                    <td>22</td>
+                                    <td>2012/03/29</td>
+                                    <td>$433,060</td>
+                                </tr>
+                                <tr>
+                                    <td>Airi Satou</td>
+                                    <td>Accountant</td>
+                                    <td>Tokyo</td>
+                                    <td>33</td>
+                                    <td>2008/11/28</td>
+                                    <td>$162,700</td>
+                                </tr>
+                                <tr>
+                                    <td>Tiger Nixon</td>
+                                    <td>System Architect</td>
+                                    <td>Edinburgh</td>
+                                    <td>61</td>
+                                    <td>2011/04/25</td>
+                                    <td>$320,800</td>
+                                </tr>
+                                <tr>
+                                    <td>Garrett Winters</td>
+                                    <td>Accountant</td>
+                                    <td>Tokyo</td>
+                                    <td>63</td>
+                                    <td>2011/07/25</td>
+                                    <td>$170,750</td>
+                                </tr>
+                                <tr>
+                                    <td>Ashton Cox</td>
+                                    <td>Junior Technical Author</td>
+                                    <td>San Francisco</td>
+                                    <td>66</td>
+                                    <td>2009/01/12</td>
+                                    <td>$86,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Cedric Kelly</td>
+                                    <td>Senior Javascript Developer</td>
+                                    <td>Edinburgh</td>
+                                    <td>22</td>
+                                    <td>2012/03/29</td>
+                                    <td>$433,060</td>
+                                </tr>
+                                <tr>
+                                    <td>Airi Satou</td>
+                                    <td>Accountant</td>
+                                    <td>Tokyo</td>
+                                    <td>33</td>
+                                    <td>2008/11/28</td>
+                                    <td>$162,700</td>
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Office</th>
+                                    <th>Age</th>
+                                    <th>Start date</th>
+                                    <th>Salary</th>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <h4 id="style">市场风格</h4>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>指数/因子/行业成分股涨跌</h5>
+                            <div class="hc-chart" id="style-raletive-chart"></div>
+                        </div>
+                    </div>
+                </section>
+                <!--other domastic market data include future and bond-->
+                <section class="botton-line" id="other-market">
+                    <h3>其他市场</h3>
+                    <p>
+                        涉及资产主要为国内商品期货/国债期货以及货币市场，主要目的是观测这部分资产的短期/高频变动，并与当前A股市场做逻辑关联。
+                    </p>
+                    <h4 id="future">商品/债期</h4>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="hc-chart" id="future-chart"></div>
+                        </div>
+                    </div>
+                    <h4 id="over-night">隔夜市场利率</h4>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="hc-chart" id="over-night-chart"></div>
+                        </div>
+                    </div>
+                    <h4 id="rate-spread">期限/信用利差</h4>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="hc-chart" id="rate-spread-chart"></div>
+                        </div>
+                    </div>
+                </section>
+                <section id="oversea">
+                    <h3>海外数据</h3>
+                    <p>
+
+                    </p>
+                    <h4 id="etf-net-flow">ETF资金流</h4>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="hc-chart" id="etf-net-flow-map"></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="hc-chart" id="etf-net-flow-components"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <br>
+        </div>
+    </main>
+</div>
+{% endblock %}
