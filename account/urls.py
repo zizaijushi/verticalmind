@@ -9,7 +9,6 @@ urlpatterns = [
     re_path(r"^logout/$", auth_views.logout, {"template_name":"account/logout.html"}, name = 'user_logout'),
     re_path(r"^register/$", views.register, name = 'register'),
     url(r"^password_change/$", auth_views.password_change,
-        {"template_name":"account/password_change_form.html","post_change_redirect":"password_change_down"},
-        name = 'password_change_form'),
+        {"post_change_redirect":"account/password_change_down"},name = 'password_change'),
     url(r"^password_change_down/$",auth_views.password_change_done, name = 'password_change_down'),
 ]
