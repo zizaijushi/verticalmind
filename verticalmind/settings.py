@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'market.apps.MarketConfig',
     'object.apps.ObjectConfig',
     'account.apps.AccountConfig',
+    # 'password_reset.apps.Password_resetConfig',
+    # 'password_reset',
 ]
 
 MIDDLEWARE = [
@@ -139,3 +141,12 @@ STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'static'), ]
 
 # Login redirect url
 LOGIN_REDIRECT_URL = '/market/'
+LOGIN_URL = '/account/login/'
+
+# Email setting
+EMAIL_HOST = 'smtp.hzinsights.com'
+EMAIL_HOST_USER = 'robot@hzinsights.com'
+EMAIL_HOST_PASSWORD = 'Hzinsights2015'
+EMAIL_PORT = 25
+EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = 'robot@hzinsights.com'
