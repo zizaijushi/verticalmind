@@ -1,7 +1,6 @@
 from django.urls import path,re_path
 from . import views
 from django.contrib.auth import views as auth_views
-from django.views.generic import RedirectView
 
 urlpatterns = [
     # log in and out urls
@@ -38,4 +37,5 @@ urlpatterns = [
     },name = 'password_reset_complete'),
 
     re_path(r"^user_page/$",views.user_profile, name = 'user_page'),
+    re_path(r'^user_page_edit/$',views.user_profile_edit, name = 'user_page_edit'),
 ]

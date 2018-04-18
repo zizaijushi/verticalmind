@@ -1,0 +1,62 @@
+{% extends 'base_market.html' %}
+{% block title %}编辑主页{% endblock %}
+{% block content %}
+<div class="container text-center vertical-middle-sm">
+    <div class="row">
+        <div class="col-6">
+            <form class="form-horizontal" action="." method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col"><span>用户名：</span></div>
+                    <div class="col text-left">{{user.username}}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><span>邮箱：</span></div>
+                    <div class="col text-left">{{user_form.email}}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><span>生日：</span></div>
+                    <div class="col text-left">{{userprofile_form.birth}}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><span>手机：</span></div>
+                    <div class="col text-left">{{userprofile_form.phone}}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><span>机构：</span></div>
+                    <div class="col text-left">{{userprofile_form.company}}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><span>职位：</span></div>
+                    <div class="col text-left">{{userprofile_form.title}}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><span>关注资产：</span></div>
+                    <div class="col text-left">{{userinfo_form.field}}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><span>风格：</span></div>
+                    <div class="col text-left">{{userinfo_form.style}}</div>
+                </div>
+                <div class="row">
+                    <div class="col"><span>微信：</span></div>
+                    <div class="col text-left">{{userprofile_form.weixin}}</div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input type="submit" class="btn btn-primary btn-lg" value="确认">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-6">
+            <p>img</p>
+        </div>
+    </div>
+    <div class="botton-line"></div>
+    <!--
+        用户页面下半部展示定制数据报告，提高可拓展性
+    -->
+    <!--<div></div>-->
+</div>
+{% endblock %}

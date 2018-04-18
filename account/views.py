@@ -85,17 +85,18 @@ def user_profile(request):
 @login_required(login_url='/account/login/')
 def user_profile_edit(request):
     user = User.objects.get(username = request.user.username)
-    userprofile = UserProfile.object.get(user = user)
+    userprofile = UserProfile.objects.get(user = user)
     userinfo = UserInfo.objects.get(user = user)
     if request.method == 'POST':
         user_form = UserForm(request.POST)
-        user_profile_form = UserProfileForm(request.POST)
-        user_info_form = UserInfoForm(request.POST)
-        if user_form.is_valid()*user_profile_form.is_valid()*user_info_form.is_valid():
+        userprofile_form = UserProfileForm(request.POST)
+        userinfo_form = UserInfoForm(request.POST)
+        if user_form.is_valid()*userprofile_form.is_valid()*userinfo_form.is_valid():
             user_cd = user_form.cleaned_data
-            userprofile_cd = user_profile_form.cleaned_data
-            userinfo_cd = user_info_form.cleaned_data
+            userprofile_cd = userprofile_form.cleaned_data
+            userinfo_cd = userinfo_form.cleaned_data
             user.email = user_cd['email']
+
             userprofile.birth = userprofile_cd['birth']
             userprofile.company = userprofile_cd['company']
             userprofile.phone = userprofile_cd['phone']
@@ -109,15 +110,15 @@ def user_profile_edit(request):
         return redirect('/account/user_page/')
     else:
         user_form = UserForm(instance=request.user)
-        user_profile_form = UserProfileForm(initial={
+        userprofile_form = UserProfileForm(initial={
             'birth':userprofile.birth,'phone':userprofile.phone,'company':userprofile.company,'title':userprofile.title,
             'weixin':userprofile.weixin,
         })
-        user_info_form = UserInfoForm(initial={
+        userinfo_form = UserInfoForm(initial={
             'field':userinfo.field,'style':userinfo.style,
         })
         return render(
             request,'account/user_page_edit.html',{
-                'user_form':user_form,'user_profile_form':user_profile_form,'user_info_form':user_info_form
+                'user_form':user_form,'userprofile_form':userprofile_form,'userinfo_form':userinfo_form
             }
         )
