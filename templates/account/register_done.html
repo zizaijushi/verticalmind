@@ -1,0 +1,14 @@
+{% extends 'base_market.html' %}
+{% block title %}注册成功{% endblock %}
+
+{% block content %}
+<div class="container text-center vertical-middle-sm">
+    <div class="row">
+        <div class="col">
+            <p>{{ text }}</p>
+            <p><a href="{{ url }}">{{ url }}</a></p>
+            <meta http-equiv="refresh" content="3;url='{{ url }}'">
+        </div>
+    </div>
+</div>
+{% endblock %}

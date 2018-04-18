@@ -1,7 +1,7 @@
 from django.urls import path,re_path
-from django.conf.urls import url
 from . import views
 from django.contrib.auth import views as auth_views
+from django.views.generic import RedirectView
 
 urlpatterns = [
     # log in and out urls
@@ -9,6 +9,7 @@ urlpatterns = [
     re_path(r"^login/$", auth_views.login, {"template_name":"account/login.html"}, name = 'user_login'),
     re_path(r"^logout/$", auth_views.logout, {"template_name":"account/logout.html"}, name = 'user_logout'),
     re_path(r"^register/$", views.register, name = 'register'),
+    re_path(r"^register_done/$",views.register_done,name = 'register_done'),
 
     # password change urls
     re_path(r"^password_change/$", auth_views.password_change,{
@@ -35,4 +36,6 @@ urlpatterns = [
     re_path(r"^password_reset_complete/$",auth_views.password_reset_complete,{
         "template_name":"account/password_reset_complete.html",
     },name = 'password_reset_complete'),
+
+    re_path(r"^user_page/$",views.user_profile, name = 'user_page'),
 ]

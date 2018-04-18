@@ -1,0 +1,61 @@
+{% extends 'base_market.html' %}
+{% block title %}{{ user }}{% endblock %}
+{% block content %}
+<div class="container text-center vertical-middle-sm">
+    <div class="row">
+        <div class="col">
+            <h1>个人主页</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="row">
+                <div class="col"><span>用户名：</span></div>
+                <div class="col text-left">{{user.username}}</div>
+            </div>
+            <div class="row">
+                <div class="col"><span>邮箱：</span></div>
+                <div class="col text-left">{{user.email}}</div>
+
+            </div>
+            <div class="row">
+                <div class="col"><span>生日：</span></div>
+                <div class="col text-left">{{userprofile.birth}}</div>
+            </div>
+            <div class="row">
+                <div class="col"><span>手机：</span></div>
+                <div class="col text-left">{{userprofile.phone}}</div>
+            </div>
+            <div class="row">
+                <div class="col"><span>机构：</span></div>
+                <div class="col text-left">{{userprofile.company}}</div>
+            </div>
+            <div class="row">
+                <div class="col"><span>职位：</span></div>
+                <div class="col text-left">{{userprofile.title}}</div>
+            </div>
+            <div class="row">
+                <div class="col"><span>关注资产：</span></div>
+                <div class="col text-left">{{userinfo.field}}</div>
+            </div>
+            <div class="row">
+                <div class="col"><span>风格：</span></div>
+                <div class="col text-left">{{userinfo.style}}</div>
+            </div>
+            <div class="row">
+                <div class="col"><span>微信：</span></div>
+                <div class="col text-left">{{userprofile.weixin}}</div>
+            </div>
+        </div>
+        <div class="col-6">
+            <p>img</p>
+        </div>
+    </div>
+    <div class="botton-line"></div>
+    <!--
+        用户页面下半部展示定制数据报告，提高可拓展性
+    -->
+    <!--<div></div>-->
+
+</div>
+{% endblock %}
