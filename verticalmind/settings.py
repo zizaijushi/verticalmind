@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'object.apps.ObjectConfig',
     'account.apps.AccountConfig',
     # 'password_reset.apps.Password_resetConfig',
-    # 'password_reset',
+    # 'password_reset,
+    'imagekit',
 ]
 
 MIDDLEWARE = [

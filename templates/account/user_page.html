@@ -1,4 +1,9 @@
 {% extends 'base_market.html' %}
+{% load static %}
+{% block css %}
+{{ block.super }}
+<link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
+{% endblock %}
 {% block title %}{{ user }}的主页{% endblock %}
 {% block content %}
 <div class="container text-center vertical-middle-sm">
@@ -48,14 +53,37 @@
             </div>
         </div>
         <div class="col-6">
-            <p>img</p>
+            <div style="max-width:100%;">
+                <img id="head-portrait" src="{% static 'img/user_head_portrait/eva.jpg' %}">
+            </div>
+            <div style="margin-right:100px">
+                <button class="btn btn-primary btn-lg" id="upload_image" onclick="upload_image_layer()">上传头像</button>
+            </div>
         </div>
     </div>
     <div class="botton-line"></div>
-    <!--
-        用户页面下半部展示定制数据报告，提高可拓展性
-    -->
+    <!--用户页面下半部展示定制数据报告，提高可拓展性-->
     <!--<div></div>-->
 
 </div>
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script src="{% static 'js/cropper.min.js' %}"></script>
+<script src="{% static 'js/jquery-cropper.min.js'%}"></script>
+<script>
+
+    $(document).ready(function(){
+        var $head_portrait = $('#head-portrait');
+        $head_portrait.cropper({
+            aspectRatio: 9/9,
+            crop: function(event){
+                console.log(event.detail.x);
+                console.log(event.detail.y);
+            }
+        });
+        var cropper = $head_portrait.data('cropper')
+    })
+</script>
 {% endblock %}
