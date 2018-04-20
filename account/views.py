@@ -4,9 +4,10 @@ from django.contrib.auth import authenticate,login
 from .forms import LoginForm,RegistrationForm,UserProfileForm,UserInfoForm,UserForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import UserInfo,UserProfile
+from .models import UserInfo,UserProfile,HeadPortrait
 from django.urls import resolve
-import re
+import re,os
+from django.conf import settings
 
 # def user_login(request):
 #     if request.method == "POST":
@@ -35,10 +36,12 @@ def register(request):
             new_user = user_form.save(commit=False)
             new_user.set_password(user_form.cleaned_data['password'])
             new_user.save()
-            UserInfo.objects.create(user = new_user)
             new_profile = userprofilefile_form.save(commit=False)
             new_profile.user = new_user
             new_profile.save()
+
+            UserInfo.objects.create(user = new_user)
+            HeadPortrait.objects.create(user = new_user)
             return redirect('/account/register_done/')
         else:
             return HttpResponse('注册失败。')
@@ -72,14 +75,13 @@ def user_profile(request):
     user = User.objects.get(username = request.user.username)
     userprofile = UserProfile.objects.get(user = user)
     userinfo = UserInfo.objects.get(user = user)
-    # if request.method == 'POST':
-    #     user_profile = UserProfileForm(request.POST)
-    #     user_info = UserInfo(request.POST)
-    #     user_form = UserForm(request.POST)
-    #     # if user_form.is_valid()*user_info.is_valid()*user_profile.is_valid():
-
+    headportrait = HeadPortrait.objects.get(user = user)
+    if not headportrait.avatar:
+        img = os.path.join(settings.MEDIA_ROOT,'user_head_portrait/HZ.jpg')
+    else:
+        img = headportrait.avatar_thumbnail_large.url
     return render(
-        request,'account/user_page.html',{'user':user,'userprofile':userprofile,'userinfo':userinfo}
+        request,'account/user_page.html',{'user':user,'userprofile':userprofile,'userinfo':userinfo,'img':img}
     )
 
 @login_required(login_url='/account/login/')
@@ -122,3 +124,15 @@ def user_profile_edit(request):
                 'user_form':user_form,'userprofile_form':userprofile_form,'userinfo_form':userinfo_form
             }
         )
+
+@login_required(login_url='/account/login')
+def upload_image(request):
+    user = User.objects.get(username=request.user.username)
+    headportrait = HeadPortrait.objects.get(user = user)
+    if request.method == 'POST':
+        head = request.POST['head']
+        headportrait.avatar = head
+        headportrait.save()
+        return HttpResponse('1')
+    else:
+        return render(request,'account/user_head_upload.html',)

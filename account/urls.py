@@ -38,4 +38,5 @@ urlpatterns = [
 
     re_path(r"^user_page/$",views.user_profile, name = 'user_page'),
     re_path(r'^user_page_edit/$',views.user_profile_edit, name = 'user_page_edit'),
+    re_path(r'^user_head_upload/$',views.upload_image, name = 'user_head_upload'),
 ]

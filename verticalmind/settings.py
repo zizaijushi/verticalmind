@@ -151,3 +151,6 @@ EMAIL_HOST_PASSWORD = 'Hzinsights2015'
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'robot@hzinsights.com'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '/media/')

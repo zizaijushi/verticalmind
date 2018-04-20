@@ -1,0 +1,83 @@
+{% extends 'base_market.html' %}
+{% load static %}
+{% block css %}
+{{ block.super }}
+<link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block title %}{{ user }}的主页{% endblock %}
+{% block content %}
+<div class="container text-center vertical-middle-sm">
+    <div class="row">
+        <div class="col-6">
+            <div class="row">
+                <div class="col-6">
+                    <h3>添加或更改头像</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p>可以选择JPG、JPEG、PNG等图片格式上传，上传照片大小最小90×90像素。</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col" id="head-img-col">
+                    <img id="head-img" src="{% static 'img/HZ.jpg' %}">
+                </div>
+            </div>
+            <input type='file' id="imgInp" class="btn btn-secondary" />
+            <!--<button class="btn btn-secondary" id="imgInp">上传文件</button>-->
+            <button class="btn btn-primary">确认</button>
+        </div>
+        <div class="col-6">
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascript %}
+{{ block.super }}
+<script src="{% static 'js/cropper.min.js' %}"></script>
+<script src="{% static 'js/jquery-cropper.min.js'%}"></script>
+<script>
+$(document).ready(function () {
+	function wcropper(dom) {
+		dom.cropper({
+			aspectRatio: 9 / 9,
+			crop: function (event) {
+				console.log(event.detail.x);
+				console.log(event.detail.y);
+				console.log(event.detail.width);
+				console.log(event.detail.height);
+				console.log(event.detail.rotate);
+				console.log(event.detail.scaleX);
+				console.log(event.detail.scaleY);
+			}
+		});
+	}
+
+	function readURL(input,dom) {
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				dom.attr('src', e.target.result);
+				dom.cropper({
+				    reset: function(){}
+				})
+			}
+			reader.readAsDataURL(input.files[0]);
+		}
+	}
+
+	var img = $('#head-img');
+	var imgPar = $('#head-img-col');
+	wcropper(img);
+	$("#imgInp").change(function () {
+		readURL(this,img);
+		new Cropper(img, {
+			ready: function () {
+				this.cropper.reset()
+			}
+		});
+	});
+});
+</script>
+{% endblock %}
