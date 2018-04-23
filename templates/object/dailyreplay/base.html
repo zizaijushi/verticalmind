@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="hz strategy platform">
+    <meta name="author" content="pete">
+    <link rel="icon" href="/static/img/hzicon.ico">
+
+    <title>{% block title %}meiri fupan houtaiguanli{% endblock %}</title>
+
+    <!-- Latest compiled and minified CSS -->
+    {% load static %}
+    {% block css %}
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="{% static 'css/hzstyles.css' %}" rel="stylesheet">
+    <link href="{% static 'css/hzstyles.min.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    {% include 'object/dailyreplay/header.html' %}
+    <div class="col-md-2">
+        {% include 'object/dailyreplay/siderbar.html' %}
+    </div>
+    <div class="col-md-10">
+        {% block content %}
+        {% endblock %}
+    </div>
+    {% include 'footer.html' %}
+</div>
+</body>
+</html>

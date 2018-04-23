@@ -1,0 +1,27 @@
+{% extends 'object/dailyreplay/base.html' %}
+
+{% block title %}每日复盘列表{% endblock %}
+
+{% block content %}
+<div>
+    <p class="text-right">
+        <button class="btn btn-primary">add artical</button>
+    </p>
+    <table class="table table-hover">
+        <tr>
+            <td>No.</td>
+            <td>Name</td>
+            <td>Operation</td>
+        </tr>
+        {% for n in name %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ n.name }}</td>
+            <td>--</td>
+        </tr>
+        {% empty %}
+        <p>This guy is too lazy to build something.</p>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
