@@ -10,3 +10,11 @@ class Apps(models.Model):
 
     def __str__(self):
         return 'APP{0}(ID:{1})'.format(self.APP_NAME,self.APP_ID)
+
+class Dailyreplay(models.Model):
+    AUTHOR = models.ForeignKey(User,on_delete=models.DO_NOTHING)
+    NAME = models.CharField(max_length=100,null=False)
+    CREATE_DT = models.DateField(null=False)
+
+    def __str__(self):
+        return self.NAME

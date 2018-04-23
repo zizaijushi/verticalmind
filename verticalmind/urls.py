@@ -25,4 +25,5 @@ urlpatterns = [
     path('market/',include(('market.urls','market'),namespace='market')),
     path('', RedirectView.as_view(url='/market/',permanent=True)),
     re_path(r'^account/', include(('account.urls','account'),namespace='account')),
+    re_path(r'^object/', include('object.urls','object'),namespace = 'object'),
 ] + static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)
