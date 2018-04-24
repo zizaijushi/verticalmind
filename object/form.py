@@ -1,7 +1,7 @@
 from django import forms
-from .models import Dailyreplay
+from .models import UserObject
 
-class Dailyreplayfrom(forms.ModelForm):
+class UserObjectForm(forms.ModelForm):
     class Meta:
-        model = Dailyreplay
-        fields = ('NAME',)
+        model = UserObject
+        fields = ('OBJECT',)
