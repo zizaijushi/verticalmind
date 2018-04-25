@@ -4,10 +4,19 @@
 
 {% block content %}
 <div>
-    <p class="text-right">
-        <button class="btn btn-primary">add class</button>
-    </p>
-    <table class="table table-hover">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="add-object" data-toggle="dropdown" aria-haspopup="true">
+            Add Class
+        </button>
+        <div class="dropdown-menu" aria-labelledby="add-object">
+            {%for unlist in unlistobject%}
+            <a class="dropdown-item add-object" href="">{{ unlist.NAME }}</a>
+            {% empty %}
+            <button class="dropdown-item" disabled>None</button>
+            {% endfor %}
+        </div>
+    </div>
+    <table class="table table-hover show-objects">
         <tr>
             <td>No.</td>
             <td>Name</td>
@@ -16,12 +25,73 @@
         {% for n in name %}
         <tr>
             <td>{{ forloop.counter }}</td>
-            <td>{{ n.name }}</td>
-            <td>--</td>
+            <td>{{ n.OBJECT }}</td>
+            <td>
+                <a name="edit" href="">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a name="delete" href="" data-toggle="modal" data-target="#del_{{ n.id }}">
+                    <i class="fas fa-prescription-bottle" style="margin-left:20px;"></i>
+                </a>
+                <div class="modal fade" id="del_{{ n.id }}" tabindex="-1" role="dialog" aria-labelledby="title_{{ n.id }}"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="title_{{ n.id }}">wawawa</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>aaaaaaa</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <a type="button" class="btn btn-primary" href="javascript:" onclick="del_object({{ n.id }})" >DELETE</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
         </tr>
         {% empty %}
         <p>This guy is too lazy to build something.</p>
         {% endfor %}
     </table>
 </div>
+{% endblock %}
+{% block javascript %}
+{{ block.super }}
+<script>
+    function del_object(id){
+        var delid = id
+        $.ajax({
+            url:'{% url "object:object_manage_del" %}',
+            type:'POST',
+            data:{'delid':delid},
+            success:function(e){
+                if(e == '1'){
+                    location.reload();
+                }
+            }
+        });
+    }
+    $(document).ready(function(){
+        $('.add-object').click(function(){
+            var addname = $(this)[0].text
+            var refreshTag = $('.show-objects')[0]
+            $.ajax({
+                url:'{% url "object:object_manage"%}',
+                type:'POST',
+                data:{"addname":addname},
+                success:function(e){
+                    if(e == '1'){
+                        refreshTag.location.reload();
+                    }
+                }
+            })
+        });
+    });
+</script>
 {% endblock %}
