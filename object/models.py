@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from slugify import slugify
-from django.urls import resolve
+from django.urls import reverse
 
 class Objects(models.Model):
     NAME = models.CharField(max_length=100,null=False,)
@@ -30,13 +30,14 @@ class Apps(models.Model):
         return 'APP{0}(ID:{1})'.format(self.APP_NAME,self.APP_ID)
 
 class Report(models.Model):
-    AUTHOR = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='DailyReplay')
+    AUTHOR = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='report')
     TITLE = models.CharField(max_length=200)
     SLUG = models.SlugField(max_length=500)
     OBJECT = models.ForeignKey(Objects,on_delete=models.DO_NOTHING)
     BODY = models.TextField()
     CREATE_DT = models.DateTimeField(default=timezone.now())
     LAST_DT = models.DateTimeField(auto_now=True)
+    USER_LIKE = models.ManyToManyField(User, related_name='report_like',blank=True)
 
     class Meta:
         ordering = ('TITLE',)
@@ -50,4 +51,4 @@ class Report(models.Model):
         super(Report, self).save(*args, **kargs)
 
     def get_absolute_url(self):
-        return resolve('object:daily_replay', args=[self.id,self.SLUG])
+        return reverse('object:report', args=[self.id,self.SLUG])

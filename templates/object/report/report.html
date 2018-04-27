@@ -1,0 +1,41 @@
+{% extends 'object/base.html' %}
+{% block title %}{{report.TITLE}}{% endblock %}
+{% load static %}
+{% block css %}
+{{block.super}}
+<link rel="stylesheet" href="{% static 'editor/css/editormd.preview.css' %}">
+{% endblock %}}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <header>
+            <h1>{{ report.TITLE }}</h1>
+            <p>{{ report.AUTHOR }} ,{{ report.LAST_DT }},{{report.OBJECT}}</p>
+        </header>
+        <div id="editormd-view">
+            <textarea id="append-test" style="display:none;">
+                {{ report.BODY }}
+            </textarea>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascript %}
+{{block.super}}
+<script src="{% static 'editor/lib/marked.min.js' %}"></script>
+<script src="{% static 'editor/lib/prettify.min.js' %}"></script>
+<script src="{% static 'editor/lib/raphael.min.js' %}"></script>
+<script src="{% static 'editor/lib/underscore.min.js' %}"></script>
+<script src="{% static 'editor/lib/sequence-diagram.min.js' %}"></script>
+<!--<script src="{% static 'editor/lib/jquery.flowchart.min.js' %}"></script>-->
+<script src="{% static 'editor/editormd.js' %}"></script>
+<script type="text/javascript">
+    $(function(){
+        editormd.markdownToHTML('editormd-view',{
+            htmlDecode:'style,script,iframe',
+            taskList:true,
+            tex:true,
+        });
+    });
+</script>
+{% endblock %}

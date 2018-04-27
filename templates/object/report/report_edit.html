@@ -1,5 +1,5 @@
 {% extends 'object/base.html' %}
-{% block title %}daily replay post{% endblock %}
+{% block title %}修改"{{ old_report.TITLE }}"{% endblock %}
 {% load static %}
 {% block css %}
 {{ block.super }}
@@ -24,18 +24,24 @@
             <div class="col-md-10 text-left">
                 <select class="form-control" id="object-select">
                     {% for object in report_objects %}
+                    {% if object == old_object %}
+                    <option value="{{ object.OBJECT_id }}" selected="selected">{{ object.OBJECT }}</option>
+                    {% else %}
                     <option value="{{ object.OBJECT_id }}">{{ object.OBJECT }}</option>
+                    {% endif %}
                     {% endfor %}
                 </select>
             </div>
         </div>
         <div class="row" style="margin-top:10px;">
             <div class="col" id="editormd">
-                <textarea style="display:none;" id="id_BODY"></textarea>
+                <textarea style="display:none;" id="id_BODY">
+                    {{ old_report.BODY }}
+                </textarea>
             </div>
         </div>
         <div class="row">
-            <input type="button" class="btn btn-primary" value="submit" onclick="publish()">
+            <input type="button" class="btn btn-primary" value="submit" onclick="edit()">
         </div>
     </form>
 </div>
@@ -54,13 +60,13 @@
     })
 </script>
 <script>
-    function publish(){
+    function edit(){
         var title=$('#id_TITLE').val();
         var object = $('#object-select').val();
         var body = $('#id_BODY').val()
-        var oid = $('#object-select')['value']
+        var oid = $('#object-select')[0]['value']
         $.ajax({
-            url:'{% url 'object:report_post' %}',
+            url:'{% url 'object:report_edit' report_id=old_report.id %}',
             type:'POST',
             data:{'TITLE':title,'BODY':body,'object':object},
             success:function(e){

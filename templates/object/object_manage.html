@@ -27,7 +27,7 @@
             <td>{{ forloop.counter }}</td>
             <td>{{ n.OBJECT }}</td>
             <td>
-                <a name="edit" href="">
+                <a name="edit" href="{% url 'object:object_list' object_id=n.OBJECT_id %}">
                     <i class="fas fa-edit"></i>
                 </a>
                 <a name="delete" href="" data-toggle="modal" data-target="#del_{{ n.id }}">

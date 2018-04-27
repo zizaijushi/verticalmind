@@ -1,0 +1,66 @@
+{% extends 'object/base.html' %}
+{% block title %}{{object.NAME}}{% endblock %}
+{% block css %}
+{{block.super}}
+{% endblock %}}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <td>No.</td>
+                <td>Title</td>
+                <td>Create date</td>
+                <td>Last update</td>
+                <td>Operation</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for report in reports %}
+            <tr id="{{ report.id }}">
+                <td>{{ forloop.counter }}</td>
+                <td><a href="{{ report.get_absolute_url }}">{{ report.TITLE }}</a></td>
+                <td>{{ report.CREATE_DT }}</td>
+                <td>{{ report.LAST_DT}}</td>
+                <td>
+                    <a name="edit" href="{% url 'object:report_edit' report_id=report.id %}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a name="delete" href="" data-toggle="modal" data-target="#del_{{ report.id }}">
+                        <i class="fas fa-prescription-bottle" style="margin-left:20px;"></i>
+                    </a>
+                    <div class="modal fade" id="del_{{ report.id }}" tabindex="-1" role="dialog" aria-labelledby="title_{{ report.id }}"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="title_{{ report.id }}">wawawa</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>aaaaaaa</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <a type="button" class="btn btn-primary" href="javascript:" onclick="del_object({{ report.id }})" >DELETE</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <p>This object dosen't have any reports or apps.</p>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% include 'object/paginator.html' %}
+    </div>
+</div>
+{% endblock %}
+{% block javascript %}
+{{block.super}}
+{% endblock %}
