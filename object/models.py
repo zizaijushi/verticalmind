@@ -37,7 +37,6 @@ class Report(models.Model):
     BODY = models.TextField()
     CREATE_DT = models.DateTimeField(default=timezone.now())
     LAST_DT = models.DateTimeField(auto_now=True)
-    USER_LIKE = models.ManyToManyField(User, related_name='report_like',blank=True)
 
     class Meta:
         ordering = ('TITLE',)
@@ -52,3 +51,11 @@ class Report(models.Model):
 
     def get_absolute_url(self):
         return reverse('object:report', args=[self.id,self.SLUG])
+
+class ReportLike(models.Model):
+    REPORT = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='report_like')
+    USER_LIKE = models.ManyToManyField(User, related_name='report_like',blank=True)
+
+    def __str__(self):
+        return '{0} like {1}'.format(self.USER_LIKE,self.REPORT)
+

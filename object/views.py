@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
 
-from .models import UserObject,Objects,Report
+from .models import UserObject,Objects,Report,ReportLike
 from .form import UserObjectForm,ReportForm
 
 @login_required(login_url='/account/user_login/')
@@ -109,3 +109,21 @@ def report_edit(request,report_id):
                 return HttpResponse('-1')
         else:
             return HttpResponse('-2')
+
+@csrf_exempt
+@require_POST
+@login_required(login_url='/account/user_login')
+def report_like(request):
+    report_id = request.POST.get('id')
+    action = request.POST.get('action')
+    if report_id and action:
+        try:
+            report = ReportLike.objects.get(REPORT=report_id)
+            if action == 'like':
+                report.USER_LIKE.add(request.user)
+                return HttpResponse('1')
+            else:
+                report.USER_LIKE.remove(request.user)
+                return HttpResponse('2')
+        except:
+            return HttpResponse('-1')
