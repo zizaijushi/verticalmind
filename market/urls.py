@@ -14,13 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path,include,re_path
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import admin
 from . import views
 
 urlpatterns = [
     path("", views.index, name = 'index'),
-    re_path(r"^market/$", views.market, name = 'market'),
-    re_path(r"^obos/$", views.obosview, name = 'obos'),
+    re_path(r"^market/$", views.marketView.as_view(), name = 'market'),
+    # re_path(r"^obos/$", views.obosview, name = 'obos'),
+    re_path(r"^obos/$",views.obosView.as_view(),name = "obos"),
     # path("glxu",views.glxu, name = 'glxu'),
     # path("bbzhang",views.bbzhang, name = 'bbzhang')
     # path('<str:TRADE_CODE>',views.detail),
