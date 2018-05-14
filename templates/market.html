@@ -1,5 +1,5 @@
 {% extends "base_market.html" %}
-
+{% load static %}
 {% block content %}
 <div class="container">
     <div class="row">
@@ -80,7 +80,7 @@
                                                 </button>
                                                 <div class="dropdown-menu" id="obos-dropdown">
                                                     {% for obos in obos_code %}
-                                                    <a class="dropdown-item obos-choose" href="#" id="{{obos.TRADE_CODE}}">{{obos.TRADE_CODE}}</a>
+                                                    <a class="dropdown-item obos-choose" onclick="changeobos('{{obos.TRADE_CODE_id}}','{{obos.SEC_NAME}}')" id="{{obos.TRADE_CODE_id}}">{{obos.SEC_NAME}}</a>
                                                     {% endfor %}
                                                 </div>
                                             </div>
@@ -93,7 +93,7 @@
                                     <div class="col">
                                         <button class="btn btn-outline-primary" type="button" data-toggle="collapse" data-target="#obos-head" aria-controls="obos-head" aria-expanded="false" aria-label="Toggle navigation">
                                             <!--<span class="navbar-toggler-icon"></span>-->
-                                            点击查看详情...
+                                            指数/因子超买超卖
                                         </button>
                                     </div>
                                 </div>
@@ -125,7 +125,7 @@
                                     <div class="col">
                                         <button class="btn btn-outline-primary" type="button" data-toggle="collapse" data-target="#amt-head" aria-controls="amt-head"
                                                 aria-expanded="false" aria-label="Toggle navigation">
-                                            点击查看详情...
+                                            指数/因子/行业成交额
                                         </button>
                                     </div>
                                 </div>
@@ -414,4 +414,65 @@
         </div>
     </main>
 </div>
+{% endblock %}
+
+{% block javascript %}
+{{block.super}}
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+<script>
+function obos_chart(data1,data2,id,title){
+    Highcharts.stockChart(id, {
+        rangeSelector: {
+            selected: 4
+        },
+        title: {
+            text: title
+        },
+        plotOptions:{
+            turboThreshold:10000000
+        },
+        yAxis:[{
+            max : 100,
+            min : 0,
+            startOnTick: false,
+            endOnTick: false,
+            labels : {
+                format : "{value}%"
+            }
+        },{
+            opposite : false,
+            labels : {
+                format : "{value}"
+            }
+        }
+        ],
+        series: [{
+            name: '超买超卖',
+            data: data1,
+            tooltip: {
+                valueDecimals: 2
+            }
+        },{
+            name: '收盘价',
+            data: data2,
+            yAxis: 1
+        }]
+    });
+}
+function changeobos(id,title){
+    $.ajax({
+        type:'POST',
+        url:"{%url 'market:obos'%}",
+        data:{'obos_selected':id},
+        success:function(e){
+            obos_chart(e.obos_data,e.close_data,'obos-chart',title);
+        }
+    })
+}
+$(document).ready(function(){
+    obos_chart({{obos_data}},{{close_data}},'obos-chart','{{ obos_select }}');
+})
+</script>
 {% endblock %}

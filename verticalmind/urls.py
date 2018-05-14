@@ -22,7 +22,7 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('market/',include(('market.urls','market'),namespace='market')),
+    re_path(r'^market/',include(('market.urls','market'),namespace='market')),
     path('', RedirectView.as_view(url='/market/',permanent=True)),
     re_path(r'^account/', include(('account.urls','account'),namespace='account')),
     re_path(r'^object/', include(('object.urls','object'),namespace = 'object')),
