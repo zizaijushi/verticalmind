@@ -28,14 +28,14 @@ class getdataMixin:
     def get_obosinfo(self):
         cursor = connections['default'].cursor()
         cursor.execute(
-            "SELECT DISTINCT C.TRADE_CODE_id,C.SEC_NAME FROM (SELECT A.TRADE_CODE_id,B.SEC_NAME FROM market_obos A LEFT JOIN market_indexinfo B ON A.TRADE_CODE_id = B.TRADE_CODE) C")
+            "SELECT DISTINCT C.TRADE_CODE,C.SEC_NAME FROM (SELECT A.TRADE_CODE,B.SEC_NAME FROM market_obos A LEFT JOIN market_indexinfo B ON A.TRADE_CODE = B.TRADE_CODE) C")
         obos_code = dictfetchall(cursor)
         return {'obos_code':obos_code}
 
     def get_obosdata(self,trade_code):
         cursor = connections['default'].cursor()
         cursor.execute(
-            "SELECT DT,VALUE FROM market_obos WHERE TRADE_CODE_id = %s",
+            "SELECT DT,VALUE FROM market_obos WHERE TRADE_CODE = %s",
             [trade_code])
         obos_data = pd.DataFrame(dictfetchall(cursor))
         cursor.execute(
