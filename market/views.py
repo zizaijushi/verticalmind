@@ -55,7 +55,7 @@ class getdataMixin:
 class marketView(getdataMixin,View):
     def get(self, request, *args, **kwargs):
         new_obosinfo = getdataMixin.get_obosinfo(self)
-        obos_select = new_obosinfo['obos_code'][0]['TRADE_CODE_id']
+        obos_select = new_obosinfo['obos_code'][0]['TRADE_CODE']
         obos_select_name = new_obosinfo['obos_code'][0]['SEC_NAME']
         new_obosdata = getdataMixin.get_obosdata(self, obos_select)
         return render(

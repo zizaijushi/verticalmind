@@ -167,7 +167,7 @@
 #     OPER_REV = models.DecimalField(max_digits=20,decimal_places=4, verbose_name='营业收入', help_text='营业收入', null=True)
 #     OPER_COST = models.DecimalField(max_digits=20,decimal_places=4, verbose_name='营业成本', help_text='营业成本', null=True)
 #     SELLING_DIST_EXP = models.DecimalField(max_digits=20,decimal_places=4, verbose_name='销售费用', help_text='销售费用', null=True)
-#     GERL_ADMIN_EXP = models.DecimalField(max_digits=20,decimal_places=4, verbose_name='管理费用', help_text='管理费用', null=True)
+#     GERL_ADMIN_EXP = models.Decimal Field(max_digits=20,decimal_places=4, verbose_name='管理费用', help_text='管理费用', null=True)
 #     FIN_EXP_IS = models.DecimalField(max_digits=20,decimal_places=4, verbose_name='财务费用', help_text='财务费用', null=True)
 #     OPPROFIT = models.DecimalField(max_digits=20,decimal_places=4, verbose_name='营业利润', help_text='营业利润', null=True)
 #     NET_PROFIT_IS = models.DecimalField(max_digits=20,decimal_places=4, verbose_name='净利润', help_text='净利润', null=True)
