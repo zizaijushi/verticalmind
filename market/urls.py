@@ -21,8 +21,9 @@ from . import views
 urlpatterns = [
     path("", views.index, name = 'index'),
     re_path(r"^market/$", views.marketView.as_view(), name = 'market'),
-    # re_path(r"^obos/$", views.obosview, name = 'obos'),
     re_path(r"^obos/$",views.obosView.as_view(),name = "obos"),
+    re_path(r"^volatility/$",views.volatilityView.as_view(),name = 'volatility'),
+    re_path(r"^volatilityRow/$",views.volatilityRowView.as_view(),name = 'volatilityRow'),
     # path("glxu",views.glxu, name = 'glxu'),
     # path("bbzhang",views.bbzhang, name = 'bbzhang')
     # path('<str:TRADE_CODE>',views.detail),

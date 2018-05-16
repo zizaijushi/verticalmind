@@ -80,7 +80,7 @@
                                                 </button>
                                                 <div class="dropdown-menu" id="obos-dropdown">
                                                     {% for obos in obos_code %}
-                                                    <a class="dropdown-item obos-choose" onclick="changeobos('{{obos.TRADE_CODE_id}}','{{obos.SEC_NAME}}')" id="{{obos.TRADE_CODE_id}}">{{obos.SEC_NAME}}</a>
+                                                    <a class="dropdown-item obos-choose" onclick="changeobos('{{obos.TRADE_CODE}}','{{obos.SEC_NAME}}')" id="{{obos.TRADE_CODE}}">{{obos.SEC_NAME}}</a>
                                                     {% endfor %}
                                                 </div>
                                             </div>
@@ -146,109 +146,17 @@
                     <h4 id="volatility">市场波动</h4>
                     <div class="row">
                         <div class="col-12">
-                            <table id="volatility-table" class="display" style="width:100%">
+                            <table id="volatility-table" class="table table-striped" style="width:100%">
                                 <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Office</th>
-                                    <th>Age</th>
-                                    <th>Start date</th>
-                                    <th>Salary</th>
+                                    <th></th>
+                                    <th>代码</th>
+                                    <th>名称</th>
+                                    <th>日期</th>
+                                    <th>收盘价</th>
+                                    <th>成交额</th>
                                 </tr>
                                 </thead>
-                                <tbody>
-                                <tr>
-                                    <td>Tiger Nixon</td>
-                                    <td>System Architect</td>
-                                    <td>Edinburgh</td>
-                                    <td>61</td>
-                                    <td>2011/04/25</td>
-                                    <td>$320,800</td>
-                                </tr>
-                                <tr>
-                                    <td>Garrett Winters</td>
-                                    <td>Accountant</td>
-                                    <td>Tokyo</td>
-                                    <td>63</td>
-                                    <td>2011/07/25</td>
-                                    <td>$170,750</td>
-                                </tr>
-                                <tr>
-                                    <td>Ashton Cox</td>
-                                    <td>Junior Technical Author</td>
-                                    <td>San Francisco</td>
-                                    <td>66</td>
-                                    <td>2009/01/12</td>
-                                    <td>$86,000</td>
-                                </tr>
-                                <tr>
-                                    <td>Cedric Kelly</td>
-                                    <td>Senior Javascript Developer</td>
-                                    <td>Edinburgh</td>
-                                    <td>22</td>
-                                    <td>2012/03/29</td>
-                                    <td>$433,060</td>
-                                </tr>
-                                <tr>
-                                    <td>Airi Satou</td>
-                                    <td>Accountant</td>
-                                    <td>Tokyo</td>
-                                    <td>33</td>
-                                    <td>2008/11/28</td>
-                                    <td>$162,700</td>
-                                </tr>
-                                <tr>
-                                    <td>Tiger Nixon</td>
-                                    <td>System Architect</td>
-                                    <td>Edinburgh</td>
-                                    <td>61</td>
-                                    <td>2011/04/25</td>
-                                    <td>$320,800</td>
-                                </tr>
-                                <tr>
-                                    <td>Garrett Winters</td>
-                                    <td>Accountant</td>
-                                    <td>Tokyo</td>
-                                    <td>63</td>
-                                    <td>2011/07/25</td>
-                                    <td>$170,750</td>
-                                </tr>
-                                <tr>
-                                    <td>Ashton Cox</td>
-                                    <td>Junior Technical Author</td>
-                                    <td>San Francisco</td>
-                                    <td>66</td>
-                                    <td>2009/01/12</td>
-                                    <td>$86,000</td>
-                                </tr>
-                                <tr>
-                                    <td>Cedric Kelly</td>
-                                    <td>Senior Javascript Developer</td>
-                                    <td>Edinburgh</td>
-                                    <td>22</td>
-                                    <td>2012/03/29</td>
-                                    <td>$433,060</td>
-                                </tr>
-                                <tr>
-                                    <td>Airi Satou</td>
-                                    <td>Accountant</td>
-                                    <td>Tokyo</td>
-                                    <td>33</td>
-                                    <td>2008/11/28</td>
-                                    <td>$162,700</td>
-                                </tr>
-                                </tbody>
-                                <tfoot>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Office</th>
-                                    <th>Age</th>
-                                    <th>Start date</th>
-                                    <th>Salary</th>
-                                </tr>
-                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -416,11 +324,32 @@
 </div>
 {% endblock %}
 
+{% block css %}
+{{ block.super }}
+<link href="http://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<style>
+td.details-control {
+    background: url('{% static 'img/details_open.png' %}') no-repeat center center;
+    cursor: pointer;
+}
+tr.shown td.details-control {
+    background: url('{% static 'img/details_close.png' %}') no-repeat center center;
+}
+.hc-chart{
+    height: 450px;
+    min-width: 310px;
+}
+</style>
+{% endblock %}
+
 {% block javascript %}
 {{block.super}}
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
 <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
 <script>
 function obos_chart(data1,data2,id,title){
     Highcharts.stockChart(id, {
@@ -431,7 +360,12 @@ function obos_chart(data1,data2,id,title){
             text: title
         },
         plotOptions:{
-            turboThreshold:10000000
+            turboThreshold:10000000,
+            line:{
+                dataGrouping:{
+                    enabled:false
+                }
+            },
         },
         yAxis:[{
             max : 100,
@@ -461,18 +395,101 @@ function obos_chart(data1,data2,id,title){
         }]
     });
 }
+function stock_chart(data1,id,title){
+    Highcharts.stockChart(id, {
+        rangeSelector: {
+            selected: 4
+        },
+        title: {
+            text: title
+        },
+        plotOptions:{
+            turboThreshold:10000000,
+            line:{
+                dataGrouping:{
+                    enabled:false
+                }
+            },
+        },
+        yAxis:[{
+            opposite : false,
+            labels : {
+                format : "{value:.2f}"
+            }
+        }],
+        series: [data1]
+    });
+}
+</script>
+<script>
 function changeobos(id,title){
     $.ajax({
         type:'POST',
         url:"{%url 'market:obos'%}",
         data:{'obos_selected':id},
         success:function(e){
-            obos_chart(e.obos_data,e.close_data,'obos-chart',title);
+            obos_chart(e.obos_value,e.obos_close,'obos-chart',title);
+        }
+    })
+}
+function format ( d ) {
+    // `d` is the original data object for the row
+    return '<table cellpadding="0" cellspacing="0" border="0" style="padding-left:100px;width:100%;">'+
+        '<tr>'+
+            '<td><div id="volatility-row-'+d[1]+'" style=""></div></td>'+
+        '</tr>'+
+    '</table>';
+}
+function volatilityRow(row){
+    var data = row.data()
+    $.ajax({
+        type:'POST',
+        url:"{% url 'market:volatilityRow' %}",
+        data:{'TRADE_CODE':data[1]},
+        success:function(e){
+            row.child( format( data ) ).show();
+            stock_chart(e,'volatility-row-'+data[1],data[2]);
         }
     })
 }
 $(document).ready(function(){
-    obos_chart({{obos_data}},{{close_data}},'obos-chart','{{ obos_select }}');
+    var volatilityTable = $('#volatility-table').DataTable({
+        ajax: "{% url 'market:volatility' %}",
+        dom: 'Btip',
+        columns: [
+            {
+                "className":      'details-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ''
+            },
+            { "data": 1 },
+            { "data": 2 },
+            { "data": 3 },
+            { "data": 4 },
+            { "data": 5 }
+            ],
+        order:[[1,'asc']],
+        pageLength:20
+    });
+
+    obos_chart({{obos_value}},{{obos_close}},'obos-chart','{{ obos_select }}');
+
+    $('#volatility-table tbody').on('click', 'td.details-control', function () {
+        var tr = $(this).closest('tr');
+        var row = volatilityTable.row( tr );
+
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this
+            volatilityRow(row);
+            tr.addClass('shown');
+        }
+    } );
 })
 </script>
 {% endblock %}
