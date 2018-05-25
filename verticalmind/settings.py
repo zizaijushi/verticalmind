@@ -89,7 +89,15 @@ DATABASES = {
         'PORT':'3306',
         'USER':'hongze_admin',
         'PASSWORD':'hongze_2018',
-    }
+    },
+    'qcloud': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'stock',
+        'HOST': '58eaf271802cb.sh.cdb.myqcloud.com',
+        'PORT': '4104',
+        'USER': 'django',
+        'PASSWORD': 'hzinsights2015',
+    },
 }
 
 

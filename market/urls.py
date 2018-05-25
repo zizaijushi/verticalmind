@@ -19,7 +19,7 @@ from django.contrib import admin
 from . import views
 
 urlpatterns = [
-    path("", views.index, name = 'index'),
+    path("", views.indexView.as_view(), name = 'index'),
     re_path(r"^market/$", views.marketView.as_view(), name = 'market'),
     re_path(r"^obos/$",views.obosView.as_view(),name = "obos"),
     re_path(r"^volatility/$",views.volatilityView.as_view(),name = 'volatility'),
