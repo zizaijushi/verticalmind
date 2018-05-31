@@ -5,11 +5,11 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
-import time
+import time,json
 import pandas as pd
 from django.db import connections
 from pymysql import connect,cursors
-from datetime import datetime
+from datetime import datetime,timedelta
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
@@ -19,11 +19,137 @@ def dictfetchall(cursor):
         for row in cursor.fetchall()
     ]
 
-class indexView(View):
+class indexMidToolsMixin:
+    def getAnomalyData(self, date):
+        cursor = connections['default'].cursor()
+        cursor.execute(
+            "SELECT * FROM (SELECT TB1.*, @R := @R +1 AS RANK FROM(SELECT A.*,B.CN_NAME,B.TABLE_NAME,B.ANOMALY FROM "
+            "(SELECT TRADE_CODE,DT,COL_NAME FROM market_thresholdanomaly UNION "
+            "SELECT TRADE_CODE,DT,COL_NAME FROM market_extremumanomaly ORDER BY DT,TRADE_CODE,COL_NAME) A "
+            "LEFT JOIN market_anomalyref B ON A.TRADE_CODE=B.TRADE_CODE AND A.COL_NAME=B.COL_NAME) TB1,(SELECT @R:= 0) TB2) TB3 WHERE TB3.DT = '{}'".format(date))
+        data = pd.DataFrame(dictfetchall(cursor))
+        cursor.close()
+        return data
+
+    def pandas2jsonlist(self,table,dateCol = None,numCol = None, pctCol = None):
+        if dateCol is not None:
+            table[dateCol] = [time.mktime(x.timetuple()) * 1000 for x in table[dateCol]]
+            # table[dataCol] = [x.strftime('%Y-%m-%d') for x in table[dataCol]]
+        if numCol is not None:
+            if type(numCol) is str:
+                numCol = [numCol]
+            for col in numCol:
+                table[col] = [float(x) for x in table[col]]
+        if pctCol is not None:
+            if type(pctCol) is str:
+                pctCol = [pctCol]
+            for col in pctCol:
+                table[col] = [float(x)*100 for x in table[col]]
+        return table
+
+    def getAnomalyDetail(self,row):
+        # Def variables
+        tradecode = row['TRADE_CODE']
+        tablename = row['TABLE_NAME']
+        colname = row['COL_NAME']
+        cnname = row['CN_NAME']
+        anomaly = row['ANOMALY']
+
+        # Get anomaly data from database
+        cursor = connections['default'].cursor()
+        cursor.execute(
+            "SELECT DT,{0} AS VALUE FROM market_{1} WHERE TRADE_CODE = '{2}'".
+                format(colname,tablename,tradecode))
+        anomalydata = pd.DataFrame(dictfetchall(cursor))
+        anomalydata = self.pandas2jsonlist(anomalydata,numCol='VALUE',dateCol='DT')
+        # Check object asset type and get close price
+        cursor.execute("SELECT TRADE_CODE,SEC_NAME,INFO_TABLE FROM market_basicinfo WHERE TRADE_CODE = '{0}'".
+                       format(tradecode))
+        info = dictfetchall(cursor)
+        secname = info[0]['SEC_NAME']
+        closetable = info[0]['INFO_TABLE'].split('info')[0]+'data'
+        cursor.execute(
+            "SELECT DT,CLOSE FROM market_{0} WHERE TRADE_CODE = '{1}' AND DT >= '{2}'".
+                format(closetable,tradecode,min(anomalydata.DT)))
+        closedata = pd.DataFrame(dictfetchall(cursor))
+        closedata = self.pandas2jsonlist(closedata,numCol='CLOSE',dateCol='DT')
+        # Options data
+        # ...
+        # Get plotlines in yaxis
+        plotLines = []
+        if(anomaly == 'threshold'):
+            cursor.execute("SELECT UPPER,LOWER FROM market_anomalyref WHERE "
+                           "TRADE_CODE = '{0}' AND COL_NAME = '{1}'".format(tradecode,colname))
+            threshold = dictfetchall(cursor)
+            upper = threshold[0]['UPPER']
+            lower = threshold[0]['LOWER']
+            lastvalue = str(round(anomalydata['VALUE'].values[-1], 1))
+            if upper is not None:
+                plotLines.append({'className':'上阈值','color':'red','dashStyle':'ShortDash','value':upper})
+                anomalytext = '指标最新值为' + lastvalue + '，高于阈值' + str(round(upper, 1)) + '。'
+            if lower is not None:
+                plotLines.append({'className':'下阈值','color':'red','dashStyle':'ShortDash','value':lower})
+                anomalytext = '指标最新值为'+ lastvalue +'，低于阈值' + str(round(lower, 1)) +'。'
+            anomaly = '阈值异动'
+
+        # Get assettype
+        cursor.execute("SELECT SEC_NAME FROM market_basicinfo a INNER JOIN "
+                       "(SELECT PARENT_CODE,MAX(DEPTH)FROM market_classtree WHERE "
+                       "CHILD_CODE = (SELECT PARENT_CODE FROM `market_classobject` WHERE "
+                       "CHILD_CODE = '881001.WI')) b ON A.TRADE_CODE = B.PARENT_CODE")
+        assettype = dictfetchall(cursor)[0]['SEC_NAME']
+        cursor.close()
+        # Build highchart options
+        options = {}
+        options['title'] = {'text': assettype+"|"+secname+"|"+cnname,'align':'left','style':{'color':'#ffffff'}}
+        options['yAxis'] = [{'title':{'text':''},'gridLineWidth':0,'labels':{'enable':0},'plotLines':plotLines},
+                            {'title': {'text': ''}, 'gridLineWidth': 0, 'labels': {'enable': 0}}]
+        options['series'] = [{'type':'area','name':cnname,'data':anomalydata.values.tolist()},{'type':'line','name':secname,'data':closedata.values.tolist(),'yAxis':1}]
+        return [options,anomaly,anomalytext]
+
+    def indexGetMethod(self,curdate):
+        anomalydata = self.getAnomalyData(curdate)
+
+        carddata = []
+        if (len(anomalydata.index) == 0):
+            carddata.append(['今天无异动信息', 1])
+        else:
+            for index, row in anomalydata.iterrows():
+                row['RANK'] = str(int(row['RANK']))
+                if index % 2 == 0:
+                    carddata.append([self.getAnomalyDetail(row), 0, 'left', row['RANK']])
+                else:
+                    carddata.append([self.getAnomalyDetail(row), 0, 'right', row['RANK']])
+        return carddata
+
+
+
+class indexView(indexMidToolsMixin,View):
     def get(self, request, *args, **kwargs):
-        return render(
-            request,'market/index.html',context={'data':1}
-        )
+        # Get last date in the page
+        lastdate = request.GET.get('lastdate')
+        if lastdate is None or lastdate == '':
+            # curdate = datetime.today().strftime('%Y-%m-%d')
+            curdate = '2018-05-29'
+            # Get data
+            carddata = indexMidToolsMixin.indexGetMethod(self, curdate)
+            return render(
+                request, 'market/index.html',
+                context={'carddata': carddata, 'curdate': curdate}
+            )
+        else:
+            curdate = (datetime.strptime(lastdate,'%Y-%m-%d').date() - timedelta(days=1)).strftime('%Y-%m-%d')
+            # Get data
+            carddata = indexMidToolsMixin.indexGetMethod(self, curdate)
+
+            return JsonResponse({'carddata': carddata, 'curdate': curdate})
+
+    def post(self, request, *args, **kwargs):
+        return JsonResponse({"data":1})
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
 class cleandataMixin:
     def pandas2jsonlist(self,table,dataCol = None,numCol = None, pctCol = None):
