@@ -3,6 +3,11 @@
 {{block.super}}
 <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
 <style>
 .search-angle {
     outline:none;
@@ -23,32 +28,75 @@
     outline:none;
 }
 </style>
+<script type="text/javascript">
+function card_chart(id,options){
+    var new_options = options
+    options = {
+        xAxis: {type: 'datetime',labels:{style:{color:'#333333'}}},
+        credits: {enabled: false},
+        exporting: {enabled: false},
+        legend: {enabled: false},
+        //chart:{backgroundColor:'#333333'},
+        plotOptions: {
+            area: {
+                fillColor: {
+                    linearGradient: {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                    },
+                    stops: [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                    ]
+                },
+                marker: {
+                    radius: 2
+                },
+                lineWidth: 1,
+                states: {
+                    hover: {
+                        lineWidth: 1
+                    }
+                },
+                threshold: null
+            },
+            line: {
+                lineWidth: 1
+            }
+        }
+    };
+    options = $.extend(options, new_options)
+    Highcharts.chart(id, options);
+};
+</script>
 {% endblock %}
 {% load static %}
 {% block hero %}
 <!--==========================
 Hero Section
 ============================-->
-<!--<section id="hero">-->
-    <!--<div class="hero-container">-->
-        <!--<div class="wow fadeIn">-->
-            <!--<div class="hero-logo">-->
-                <!--<img class="" src="{% static 'img/Logo_2.png' %}" alt="Imperial">-->
-            <!--</div>-->
+<section id="hero">
+    <div class="hero-container">
+        <div class="wow fadeIn">
+            <div class="hero-logo">
+                <img class="" src="{% static 'img/Logo_2.png' %}" alt="Imperial">
+            </div>
 
-            <!--<h1>弘则策略 · 数据平台</h1>-->
-            <!--<h2>我们用 <span class="rotating">数据说话, 图交流, 心研究</span></h2>-->
-            <!--<div class="actions">-->
-                <!--{% if user.is_authenticated %}-->
-                <!--<a href="{% url 'account:user_page' %}" class="btn-get-started">个人页面</a>-->
-                <!--{% else %}-->
-                <!--<a href="{% url 'account:user_login' %}" class="btn-get-started">登录</a>-->
-                <!--<a href="{% url 'account:register' %}" class="btn-services">注册</a>-->
-                <!--{% endif %}-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-<!--</section>-->
+            <h1>弘则策略 · 数据平台</h1>
+            <h2>我们用 <span class="rotating">数据说话, 图交流, 心研究</span></h2>
+            <div class="actions">
+                {% if user.is_authenticated %}
+                <a href="{% url 'account:user_page' %}" class="btn-get-started">个人页面</a>
+                {% else %}
+                <a href="{% url 'account:user_login' %}" class="btn-get-started">登录</a>
+                <a href="{% url 'account:register' %}" class="btn-services">注册</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
 {% block content %}
 
@@ -87,48 +135,29 @@ Anomaly Section
                     </div>
                 </div>
                 {% else %}
-                {% if card.2 == 'left' %}
                 <div class="card">
                     <div class="row">
                         <div class="col-md-9">
                             <div id="card-chart-{{card.3}}" class="card-chart"></div>
-                            <script>
-                                $(function() {card_chart('card-chart-{{card.3}}',{{card.0|safe}})})
-                                // $(function() {card_chart('card-chart-{{card.3}}',{{card.0|safe}})})
+                            <script type="text/javascript">
+                                $(function() {card_chart('card-chart-{{card.3}}',{{card.0.0|safe}})})
+                                // $(function() {card_chart('card-chart-{{card.3}}',{{card.0.0|safe}})})
                             </script>
                         </div>
                         <div class="col-md-3 card-body">
                             <div class="card-body">
-                                <h5 class="card-title">{{card.data.anomaly}}</h5>
-                                <p class="card-text">{{card.data.anomalytext}}</p>
-                                <br>
-                                <button type="button" class="btn btn-info" onclick="chgchart('card-chart-{{card.3}}')"
+                                <h5 class="card-title">{{card.0.1}}</h5>
+                                <p class="card-text">{{card.0.2}}</p>
+                                <!--<br>-->
+                                <button type="button" class="btn btn-info align-bottom"
+                                        onclick="chgchart('{{card.3}}','{{curdate}}')"
                                         id="card-button-{{card.3}}">查看详情</button>
+                                <p class="card-footer align-bottom align-text-bottom card-date"
+                                   style="font-size:9px">{{ curdate }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% else %}
-                <div class="card">
-                    <div class="row">
-                        <div class="col-md-3 card-body">
-                            <div class="card-body">
-                                <h5 class="card-title">{{card.data.anomaly}}</h5>
-                                <p class="card-text">{{card.data.anomalytext}}</p>
-                                <br>
-                                <button type="button" class="btn btn-info" onclick="chgchart('card-chart-{{card.3}}')"
-                                        id="card-button-{{card.3}}">查看详情</button>
-                            </div>
-                        </div>
-                        <div class="col-md-9">
-                            <div id="card-chart-{{card.3}}" class="card-chart"></div>
-                            <script>
-                                $(function() {card_chart('card-chart-{{card.3}}',{{card.0|safe}})})
-                            </script>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
                 {% endif %}
                 {% endfor %}
 
@@ -300,93 +329,77 @@ Contact Section
 {% block js %}
 {{ block.super }}
 <!--<script src="https://code.highcharts.com/highcharts.js"></script>-->
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/modules/export-data.js"></script>
-<script src="https://code.highcharts.com/stock/highstock.js"></script>
-<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
-<script>
-function card_chart_temp(id,options){
-    Highcharts.chart(id, {
-        xAxis: {type: 'datetime',labels:{style:{color:'#ffffff'}}},
-        credits: {enabled: false},
-        exporting: {enabled: false},
-        legend: {enabled: false},
-        chart:{backgroundColor:'#333333'},
-        plotOptions: {
-            area: {
-                fillColor: {
-                    linearGradient: {
-                        x1: 0,
-                        y1: 0,
-                        x2: 0,
-                        y2: 1
-                    },
-                    stops: [
-                        [0, Highcharts.getOptions().colors[0]],
-                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                    ]
-                },
-                marker: {
-                    radius: 2
-                },
-                lineWidth: 1,
-                states: {
-                    hover: {
-                        lineWidth: 1
-                    }
-                },
-                threshold: null
-            },
-            line: {
-                lineWidth: 1
-            }
-        },
-        options
-    });
-};
-function card_chart_redraw(id,symbol,title){
-    $.getJSON('https://cdn.rawgit.com/highcharts/highcharts/057b672172ccc6c08fe7dbb27fc17ebca3f5b770/samples/data/usdeur.json',function(data){
-        Highcharts.stockChart(id,{
-            rangeSelector: {
-                selected: 4
-            },
-            title: {
-                text: title
-            },
 
-            series: [{
-                name: 'USD to EUR',
-                data: data,
-                tooltip: {
-                    valueDecimals: 2
-                }
-            }]
-        });
-    });
+<script>
+function card_chart_redraw(id,options){
+    var new_options = options
+    options = {
+        credits: {enabled: false},
+        legend: {enabled: true},
+        rangeSelector: {
+            selected: 4
+        },
+        chart:{
+            zoomType: 'xy'
+        }
+    };
+    options = $.extend(options, new_options)
+    Highcharts.stockChart(id, options);
 };
 // Function for change card chart
-function chgchart(id){
-    var chart = $("#"+id);
+function chgchart(rankid,date){
+    var btn = btn = $( '#card-button-'+rankid )
+    var chart = $("#card-chart-"+rankid);
     chart.highcharts().destroy();
-    if(chart.css('height') == '200px'){
+    if(btn.text() == '查看详情'){
         chart.css('height','450px');
         chart.one('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend',
             function(e) {
-                //card_chart_redraw(id,'000300.SH','股票|沪深300|后复权收盘价');
-                $('#card-button-1').text('收起')
+                $.ajax({
+                    url:'{% url 'market:index' %}',
+                    type:'GET',
+                    data:{
+                        'charttype':1,
+                        'lastdate':date,
+                        'rankid':rankid
+                    },
+                    success:function(data){
+                        var data = data.chartdata
+                        card_chart_redraw('card-chart-'+rankid,data[0]);
+                        btn.text('收起')
+                    },
+                    error:function(e){
+                        btn.text('出错啦')
+                    }
+                });
+
         });
     }else{
-        chart.css('height','200px');
+        chart.css('height','250px');
         chart.one('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend',
             function(e) {
-                //card_chart(id,'000300.SH','股票|沪深300|后复权收盘价');
-                $('#card-button-1').text('查看详情')
+                $.ajax({
+                    url:'{% url 'market:index' %}',
+                    type:'GET',
+                    data:{
+                        'charttype':0,
+                        'lastdate':date,
+                        'rankid':rankid
+                    },
+                    success:function(data){
+                        var data = data.chartdata
+                        card_chart('card-chart-'+rankid,data[0])
+                        btn.text('查看详情')
+                    },
+                    error:function(e){
+                        btn.text('出错啦')
+                    }
+                })
         });
     };
 };
 // Function for add more card
-function add_cards(lastdate){
+function add_cards(lastdate,btn){
     $.ajax({
         type:'GET',
         url:'{% url 'market:index' %}',
@@ -397,6 +410,7 @@ function add_cards(lastdate){
 
             // Change add card button name
             $('#add-card').attr('name', curdate);
+            $('#temp').remove();
 
             // Create cards
             newhtml =
@@ -405,52 +419,40 @@ function add_cards(lastdate){
                         '<h4><i class="far fa-clock"></i> '+curdate+'</h4>'+
                     '</div>'+
                 '</div>'
+            $(newhtml).insertBefore( btn );
 
             carddata.forEach(function(e){
                 if(e[1] == 1){
-                    newhtml = newhtml+
+                    newhtml =
                         '<div class="card">'+
                             '<div class="card-body">'+
                                 '<h4>'+e[0]+'</h4>'+
                             '</div>'+
                         '</div>'
                 }else{
-                    if(e[2] == 'left'){
-                        newhtml = newhtml+
-                            '<div class="card">'+
-                                '<div class="row">'+
-                                    '<div class="col-md-9">'+
-                                        '<div id="card-chart-'+e[3]+'" class="card-chart"></div>'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<div class="card-body">'+
-                                            '<h5 class="card-title">'+e[0][]+'</h5>'+
-                                            '<p class="card-text">{{card.data.anomalytext}}</p> <br>'+
-                                            '<button type="button" class="btn btn-info" onclick="chgchart('card-chart-{{card.3}}')" id="card-button-{{card.3}}">查看详情</button>'+
-                                        '</div>'+
+                    edate = "'"+curdate+"'"
+                    newhtml =
+                        '<div class="card">'+
+                            '<div class="row">'+
+                                '<div class="col-md-9">'+
+                                    '<div id="card-chart-'+e[3]+'" class="card-chart"></div>'+
+                                '</div>'+
+                                '<div class="col-md-3">'+
+                                    '<div class="card-body">'+
+                                        '<h5 class="card-title">'+e[0][1]+'</h5>'+
+                                        '<p class="card-text">'+e[0][2]+'</p><br>'+
+                                        '<button type="button" class="btn btn-info" '+
+                                        'onclick="chgchart('+e[3]+','+edate+')" '+
+                                        'id="card-button-'+e[3]+'">查看详情</button>'+
                                     '</div>'+
                                 '</div>'+
-                            '</div>'
-                    }else{
-                        newhtml = newhtml+
-                            '<div class="card">'+
-                                '<div class="row">'+
-                                    '<div class="col-md-9">'+
-                                        '<div id="card-chart-'+e[3]+'" class="card-chart"></div>'+
-                                    '</div>'+
-                                    '<div class="col-md-3">'+
-                                        '<div class="card-body">'+
-                                            '<h5 class="card-title">'+e[0][]+'</h5>'+
-                                            '<p class="card-text">{{card.data.anomalytext}}</p> <br>'+
-                                            '<button type="button" class="btn btn-info" onclick="chgchart('card-chart-{{card.3}}')" id="card-button-{{card.3}}">查看详情</button>'+
-                                        '</div>'+
-                                    '</div>'+
-                                '</div>'+
-                            '</div>'
-                    }
+                            '</div>'+
+                        '</div>'
                 }
+                $.when( $(newhtml).insertBefore( btn ) ).then( card_chart('card-chart-'+e[3],e[0][0]) );
+                //$(newhtml).insertBefore( btn );
+                //$(function(){card_chart('card-chart-'+e[3],e[0][0]);})
             });
-            return(newhtml);
         }
     });
 }
@@ -461,15 +463,19 @@ $(document).ready(function(){
     $('.search-angle').click(function(){
         if($(this).css("transform") == 'none'){
             $(this).css("transform","rotate(180deg)");
+            // Add a searchbar
+
+            //
         }else{
             $(this).css("transform","");
         }
     })
     // Add more card
     $('#add-card').click(function(){
-        var btn = $(this)
-        var lastdate = btn.attr('name')
-        $(add_cards(lastdate)).btn;
+        var btn = $(this);
+        var lastdate = btn.attr('name');
+        $('<div class="card" id="temp"><div class="card-body"><h4>请稍后...</h4></div></div>').insertBefore( btn );
+        add_cards(lastdate, btn);
     });
 });
 </script>

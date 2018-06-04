@@ -86,7 +86,7 @@ h1, h2, h3, h4, h5, h6 {
   display: table;
   width: 100%;
   height: 100vh;
-  background: url(../img/hero-bg.jpg) top center;
+  background: url(../img/marvel.jpg) top center;
   background-size: cover;
 }
 
@@ -105,7 +105,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #hero .hero-container {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.4);
   display: table-cell;
   margin: 0;
   padding: 0;
@@ -828,6 +828,6 @@ body.mobile-nav-active #mobile-nav-toggle {
 --------------------------------------------------------------*/
 .card-chart {
     transition: all 0.5s ease-in-out;
-    height:200px;
+    height:250px;
     margin:9 auto;
 }
