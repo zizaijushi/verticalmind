@@ -376,8 +376,10 @@ function keyboard_monitor(data,input){
         }
         if ($.isNumeric(text) && text == 1){
             var dropdowninsert = '';
+            var inputval = input.val();
+            var candidates = data.filter(function (search) { return search.VALUE ==  inputval});
+
             $('.dropdown-item').remove();
-            candidates = [input.val()];
             $.each(candidates,function(idx,val){
                 dropdowninsert = dropdowninsert+
                     '<a class="dropdown-item" >'+val+'</a>';

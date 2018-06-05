@@ -306,7 +306,7 @@ class keywordsView(indexMidToolsMixin,View):
         colname = [x for x in list(keywords.columns.values) if x not in ['TRADE_CODE','SYMBOL']]
         for n in colname:
             temp = pd.concat([temp,keywords[['TRADE_CODE',n]].rename(columns = {n:'VALUE'})],axis=0)
-        keywords = temp.values.tolist()
+        keywords = temp.to_json(orient='records')
         cursor.close()
         return JsonResponse({'keywords':keywords})
 
