@@ -831,3 +831,87 @@ body.mobile-nav-active #mobile-nav-toggle {
     height:250px;
     margin:9 auto;
 }
+
+/*--------------------------------------------------------------
+# Search bar
+--------------------------------------------------------------*/
+
+.search-angle {
+    outline:none;
+    border: none;
+    // margin: 0;
+    padding: 6px 8px;
+    color:rgba(0,0,0,1);
+    background: rgba(0,0,0,0);
+    font-size: 19pt;
+
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -ms-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+}
+.search-angle:focus,.search-angle:hover,.search-angle:active{
+    outline:none;
+}
+
+/*--------------------------------------------------------------
+# Chart
+--------------------------------------------------------------*/
+function card_chart(id,options){
+    var new_options = options
+    options = {
+        xAxis: {type: 'datetime',labels:{style:{color:'#333333'}}},
+        credits: {enabled: false},
+        exporting: {enabled: false},
+        legend: {enabled: false},
+        //chart:{backgroundColor:'#333333'},
+        plotOptions: {
+            area: {
+                fillColor: {
+                    linearGradient: {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                    },
+                    stops: [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                    ]
+                },
+                marker: {
+                    radius: 2
+                },
+                lineWidth: 1,
+                states: {
+                    hover: {
+                        lineWidth: 1
+                    }
+                },
+                threshold: null
+            },
+            line: {
+                lineWidth: 1
+            }
+        }
+    };
+    options = $.extend(options, new_options)
+    Highcharts.chart(id, options);
+};
+
+function card_chart_redraw(id,options){
+    var new_options = options
+    options = {
+        credits: {enabled: false},
+        legend: {enabled: true},
+        rangeSelector: {
+            selected: 4
+        },
+        chart:{
+            zoomType: 'xy'
+        }
+    };
+    options = $.extend(options, new_options)
+    Highcharts.stockChart(id, options);
+};

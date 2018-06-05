@@ -1,6 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
 {% block css %}
 {{block.super}}
+<!-- Main Stylesheet File -->
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'lib/datepicker/css/bootstrap-datepicker.standalone.css' %}">
 <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
@@ -8,98 +12,42 @@
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+<script src="{% static 'lib/datepicker/js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'lib/datepicker/locales/bootstrap-datepicker.zh-CN.min.js' %}"></script>
 <style>
-.search-angle {
-    outline:none;
-    border: none;
-    // margin: 0;
-    padding: 6px 8px;
-    color:rgba(0,0,0,1);
-    background: rgba(0,0,0,0);
-    font-size: 19pt;
-
-    -webkit-transition: all 0.5s ease-in-out;
-    -moz-transition: all 0.5s ease-in-out;
-    -ms-transition: all 0.5s ease-in-out;
-    -o-transition: all 0.5s ease-in-out;
-    transition: all 0.5s ease-in-out;
-}
-.search-angle:focus,.search-angle:hover,.search-angle:active{
-    outline:none;
+.searchbar-items {
+    display:inline-block;
+    margin-top:20px;
 }
 </style>
-<script type="text/javascript">
-function card_chart(id,options){
-    var new_options = options
-    options = {
-        xAxis: {type: 'datetime',labels:{style:{color:'#333333'}}},
-        credits: {enabled: false},
-        exporting: {enabled: false},
-        legend: {enabled: false},
-        //chart:{backgroundColor:'#333333'},
-        plotOptions: {
-            area: {
-                fillColor: {
-                    linearGradient: {
-                        x1: 0,
-                        y1: 0,
-                        x2: 0,
-                        y2: 1
-                    },
-                    stops: [
-                        [0, Highcharts.getOptions().colors[0]],
-                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                    ]
-                },
-                marker: {
-                    radius: 2
-                },
-                lineWidth: 1,
-                states: {
-                    hover: {
-                        lineWidth: 1
-                    }
-                },
-                threshold: null
-            },
-            line: {
-                lineWidth: 1
-            }
-        }
-    };
-    options = $.extend(options, new_options)
-    Highcharts.chart(id, options);
-};
-</script>
 {% endblock %}
 {% load static %}
 {% block hero %}
 <!--==========================
 Hero Section
 ============================-->
-<section id="hero">
-    <div class="hero-container">
-        <div class="wow fadeIn">
-            <div class="hero-logo">
-                <img class="" src="{% static 'img/Logo_2.png' %}" alt="Imperial">
-            </div>
+<!--<section id="hero">-->
+<!--<div class="hero-container">-->
+<!--<div class="wow fadeIn">-->
+<!--<div class="hero-logo">-->
+<!--<img class="" src="{% static 'img/Logo_2.png' %}" alt="Imperial">-->
+<!--</div>-->
 
-            <h1>弘则策略 · 数据平台</h1>
-            <h2>我们用 <span class="rotating">数据说话, 图交流, 心研究</span></h2>
-            <div class="actions">
-                {% if user.is_authenticated %}
-                <a href="{% url 'account:user_page' %}" class="btn-get-started">个人页面</a>
-                {% else %}
-                <a href="{% url 'account:user_login' %}" class="btn-get-started">登录</a>
-                <a href="{% url 'account:register' %}" class="btn-services">注册</a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</section>
+<!--<h1>弘则策略 · 数据平台</h1>-->
+<!--<h2>我们用 <span class="rotating">数据说话, 图交流, 心研究</span></h2>-->
+<!--<div class="actions">-->
+<!--{% if user.is_authenticated %}-->
+<!--<a href="{% url 'account:user_page' %}" class="btn-get-started">个人页面</a>-->
+<!--{% else %}-->
+<!--<a href="{% url 'account:user_login' %}" class="btn-get-started">登录</a>-->
+<!--<a href="{% url 'account:register' %}" class="btn-services">注册</a>-->
+<!--{% endif %}-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</section>-->
 {% endblock %}
 {% block content %}
-
 <!--==========================
 Anomaly Section
 ============================-->
@@ -110,13 +58,40 @@ Anomaly Section
                 <div class="row last">
                     <div class="col-md-12">
                         <h3 class="section-title">数据异动<button class="search-angle"><i class="fas fa-angle-down"></i></button></h3>
-                        <div class="section-card card" style="display: none;">
-                            <div class="row">
-                                <div class="col-md-12 card-body">
-                                    <input type="text" class="form-control">
+                        <div class="section-card card searchbar" id="searchbar" style="display: none;">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 searchbar-items">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">选择资产</span>
+                                            </div>
+                                            <input type="text" class="form-control" id="classSelect">
+                                            <div class="dropdown-menu" id="classdropdown"></div>
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">选择标的</span>
+                                            </div>
+                                            <input type="text" class="form-control" id="tradecodeSelect">
+                                            <div class="dropdown-menu" id="tradedropdown"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 searchbar-items">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">选择日期</span>
+                                            </div>
+                                            <input type="text" class="form-control" id="dateSelect">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 searchbar-items">
+                                        <button type="button" class="btn btn-info" style="float: right;">搜索</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <span></span>
                         <div class="section-title-divider"></div>
                         <p class="section-description">每日17:30更新当日出现异动的数据，点击可查看该数据的详细信息。</p>
                     </div>
@@ -150,7 +125,7 @@ Anomaly Section
                                 <p class="card-text">{{card.0.2}}</p>
                                 <!--<br>-->
                                 <button type="button" class="btn btn-info align-bottom"
-                                        onclick="chgchart('{{card.3}}','{{curdate}}')"
+                                        onclick="chg_chart('{{card.3}}','{{curdate}}')"
                                         id="card-button-{{card.3}}">查看详情</button>
                                 <p class="card-footer align-bottom align-text-bottom card-date"
                                    style="font-size:9px">{{ curdate }}</p>
@@ -192,138 +167,75 @@ Anomaly Section
 Team Section
 ============================-->
 <!--<section id="team">-->
-    <!--<div class="container wow fadeInUp">-->
-        <!--<div class="row">-->
-            <!--<div class="col-md-12">-->
-                <!--<h3 class="team-title">Our Team</h3>-->
-                <!--<div class="section-title-divider"></div>-->
-                <!--<p class="team-description">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque</p>-->
-            <!--</div>-->
-        <!--</div>-->
-        <!--<div class="row">-->
-            <!--<div class="col-md-3">-->
-                <!--<div class="member">-->
-                    <!--<div class="pic"><img src="img/team-1.jpg" alt=""></div>-->
-                    <!--<h4>XD Tang</h4>-->
-                    <!--<span>Team Leader</span>-->
-                    <!--<div class="social">-->
-                        <!--<a href=""><i class="fa fa-twitter"></i></a>-->
-                        <!--<a href=""><i class="fa fa-facebook"></i></a>-->
-                        <!--<a href=""><i class="fa fa-google-plus"></i></a>-->
-                        <!--<a href=""><i class="fa fa-linkedin"></i></a>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
+<!--<div class="container wow fadeInUp">-->
+<!--<div class="row">-->
+<!--<div class="col-md-12">-->
+<!--<h3 class="team-title">Our Team</h3>-->
+<!--<div class="section-title-divider"></div>-->
+<!--<p class="team-description">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque</p>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="row">-->
+<!--<div class="col-md-3">-->
+<!--<div class="member">-->
+<!--<div class="pic"><img src="img/team-1.jpg" alt=""></div>-->
+<!--<h4>XD Tang</h4>-->
+<!--<span>Team Leader</span>-->
+<!--<div class="social">-->
+<!--<a href=""><i class="fa fa-twitter"></i></a>-->
+<!--<a href=""><i class="fa fa-facebook"></i></a>-->
+<!--<a href=""><i class="fa fa-google-plus"></i></a>-->
+<!--<a href=""><i class="fa fa-linkedin"></i></a>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
 
-            <!--<div class="col-md-3">-->
-                <!--<div class="member">-->
-                    <!--<div class="pic"><img src="img/team-2.jpg" alt=""></div>-->
-                    <!--<h4>Y Pan</h4>-->
-                    <!--<span>Data Engineer</span>-->
-                    <!--<div class="social">-->
-                        <!--<a href=""><i class="fa fa-twitter"></i></a>-->
-                        <!--<a href=""><i class="fa fa-facebook"></i></a>-->
-                        <!--<a href=""><i class="fa fa-google-plus"></i></a>-->
-                        <!--<a href=""><i class="fa fa-linkedin"></i></a>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
+<!--<div class="col-md-3">-->
+<!--<div class="member">-->
+<!--<div class="pic"><img src="img/team-2.jpg" alt=""></div>-->
+<!--<h4>Y Pan</h4>-->
+<!--<span>Data Engineer</span>-->
+<!--<div class="social">-->
+<!--<a href=""><i class="fa fa-twitter"></i></a>-->
+<!--<a href=""><i class="fa fa-facebook"></i></a>-->
+<!--<a href=""><i class="fa fa-google-plus"></i></a>-->
+<!--<a href=""><i class="fa fa-linkedin"></i></a>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
 
-            <!--<div class="col-md-3">-->
-                <!--<div class="member">-->
-                    <!--<div class="pic"><img src="img/team-3.jpg" alt=""></div>-->
-                    <!--<h4>GL Xu</h4>-->
-                    <!--<span>Data Scientist</span>-->
-                    <!--<div class="social">-->
-                        <!--<a href=""><i class="fa fa-twitter"></i></a>-->
-                        <!--<a href=""><i class="fa fa-facebook"></i></a>-->
-                        <!--<a href=""><i class="fa fa-google-plus"></i></a>-->
-                        <!--<a href=""><i class="fa fa-linkedin"></i></a>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
+<!--<div class="col-md-3">-->
+<!--<div class="member">-->
+<!--<div class="pic"><img src="img/team-3.jpg" alt=""></div>-->
+<!--<h4>GL Xu</h4>-->
+<!--<span>Data Scientist</span>-->
+<!--<div class="social">-->
+<!--<a href=""><i class="fa fa-twitter"></i></a>-->
+<!--<a href=""><i class="fa fa-facebook"></i></a>-->
+<!--<a href=""><i class="fa fa-google-plus"></i></a>-->
+<!--<a href=""><i class="fa fa-linkedin"></i></a>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
 
-            <!--<div class="col-md-3">-->
-                <!--<div class="member">-->
-                    <!--<div class="pic"><img src="img/team-4.jpg" alt=""></div>-->
-                    <!--<h4>BB Zhang</h4>-->
-                    <!--<span>Analyst</span>-->
-                    <!--<div class="social">-->
-                        <!--<a href=""><i class="fa fa-twitter"></i></a>-->
-                        <!--<a href=""><i class="fa fa-facebook"></i></a>-->
-                        <!--<a href=""><i class="fa fa-google-plus"></i></a>-->
-                        <!--<a href=""><i class="fa fa-linkedin"></i></a>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
+<!--<div class="col-md-3">-->
+<!--<div class="member">-->
+<!--<div class="pic"><img src="img/team-4.jpg" alt=""></div>-->
+<!--<h4>BB Zhang</h4>-->
+<!--<span>Analyst</span>-->
+<!--<div class="social">-->
+<!--<a href=""><i class="fa fa-twitter"></i></a>-->
+<!--<a href=""><i class="fa fa-facebook"></i></a>-->
+<!--<a href=""><i class="fa fa-google-plus"></i></a>-->
+<!--<a href=""><i class="fa fa-linkedin"></i></a>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
 
-        <!--</div>-->
-    <!--</div>-->
+<!--</div>-->
+<!--</div>-->
 <!--</section>-->
 
-<!--==========================
-Contact Section
-============================-->
-<!--<section id="contact">-->
-    <!--<div class="container wow fadeInUp">-->
-        <!--<div class="row">-->
-            <!--<div class="col-md-12">-->
-                <!--<h3 class="section-title">Contact Us</h3>-->
-                <!--<div class="section-title-divider"></div>-->
-                <!--<p class="section-description">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque</p>-->
-            <!--</div>-->
-        <!--</div>-->
-
-        <!--<div class="row">-->
-            <!--<div class="col-md-3 col-md-push-2">-->
-                <!--<div class="info">-->
-                    <!--<div>-->
-                        <!--<i class="fa fa-map-marker"></i>-->
-                        <!--<p>A108 Adam Street<br>New York, NY 535022</p>-->
-                    <!--</div>-->
-
-                    <!--<div>-->
-                        <!--<i class="fa fa-envelope"></i>-->
-                        <!--<p>info@example.com</p>-->
-                    <!--</div>-->
-
-                    <!--<div>-->
-                        <!--<i class="fa fa-phone"></i>-->
-                        <!--<p>+1 5589 55488 55s</p>-->
-                    <!--</div>-->
-
-                <!--</div>-->
-            <!--</div>-->
-
-            <!--<div class="col-md-5 col-md-push-2">-->
-                <!--<div class="form">-->
-                    <!--<div id="sendmessage">Your message has been sent. Thank you!</div>-->
-                    <!--<div id="errormessage"></div>-->
-                    <!--<form action="" method="post" role="form" class="contactForm">-->
-                        <!--<div class="form-group">-->
-                            <!--<input type="text" name="name" class="form-control" id="name" placeholder="Your Name" data-rule="minlen:4" data-msg="Please enter at least 4 chars" />-->
-                            <!--<div class="validation"></div>-->
-                        <!--</div>-->
-                        <!--<div class="form-group">-->
-                            <!--<input type="email" class="form-control" name="email" id="email" placeholder="Your Email" data-rule="email" data-msg="Please enter a valid email" />-->
-                            <!--<div class="validation"></div>-->
-                        <!--</div>-->
-                        <!--<div class="form-group">-->
-                            <!--<input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" data-rule="minlen:4" data-msg="Please enter at least 8 chars of subject" />-->
-                            <!--<div class="validation"></div>-->
-                        <!--</div>-->
-                        <!--<div class="form-group">-->
-                            <!--<textarea class="form-control" name="message" rows="5" data-rule="required" data-msg="Please write something for us" placeholder="Message"></textarea>-->
-                            <!--<div class="validation"></div>-->
-                        <!--</div>-->
-                        <!--<div class="text-center"><button type="submit">Send Message</button></div>-->
-                    <!--</form>-->
-                <!--</div>-->
-            <!--</div>-->
-
-        <!--</div>-->
-    <!--</div>-->
-<!--</section>-->
 {% endblock %}
 
 {% block js %}
@@ -331,23 +243,8 @@ Contact Section
 <!--<script src="https://code.highcharts.com/highcharts.js"></script>-->
 
 <script>
-function card_chart_redraw(id,options){
-    var new_options = options
-    options = {
-        credits: {enabled: false},
-        legend: {enabled: true},
-        rangeSelector: {
-            selected: 4
-        },
-        chart:{
-            zoomType: 'xy'
-        }
-    };
-    options = $.extend(options, new_options)
-    Highcharts.stockChart(id, options);
-};
 // Function for change card chart
-function chgchart(rankid,date){
+function chg_chart(rankid,date){
     var btn = btn = $( '#card-button-'+rankid )
     var chart = $("#card-chart-"+rankid);
     chart.highcharts().destroy();
@@ -442,7 +339,7 @@ function add_cards(lastdate,btn){
                                         '<h5 class="card-title">'+e[0][1]+'</h5>'+
                                         '<p class="card-text">'+e[0][2]+'</p><br>'+
                                         '<button type="button" class="btn btn-info" '+
-                                        'onclick="chgchart('+e[3]+','+edate+')" '+
+                                        'onclick="chg_chart('+e[3]+','+edate+')" '+
                                         'id="card-button-'+e[3]+'">查看详情</button>'+
                                     '</div>'+
                                 '</div>'+
@@ -455,19 +352,129 @@ function add_cards(lastdate,btn){
             });
         }
     });
-}
+};
+// Keyboard monitor
+function keyboard_monitor(data,input){
+    var dropdown = input.next();
+
+    input.bind('keyup',function(e){
+        var text = 0
+        if (!dropdown.hasClass('show')){
+            dropdown.addClass('show');
+        }
+        // Get input value
+        if ((e.which>=48 && e.which<=57) || (e.which>=65 && e.which<=90) ||
+            e.which ==190 || e.which == 229){
+            text = 1;
+        }
+        if (e.which == 8){
+            text = 2;
+        }
+        if (e.which == 13){
+            $(this).blur();
+            //text = 0
+        }
+        if ($.isNumeric(text) && text == 1){
+            var dropdowninsert = '';
+            $('.dropdown-item').remove();
+            candidates = [input.val()];
+            $.each(candidates,function(idx,val){
+                dropdowninsert = dropdowninsert+
+                    '<a class="dropdown-item" >'+val+'</a>';
+            });
+            dropdown.append(dropdowninsert);
+            // Click dropdown
+            $('.dropdown-item').click(function() {
+                var item = $(this);
+                var dropdown = item.parent();
+                var input = dropdown.prev();
+
+                dropdown.removeClass('show');
+                input.val(item.text()+'001');
+            });
+        };
+    });
+};
+//
+function refresh_cards(){
+
+};
+
 // Main document
 $(document).ready(function(){
-    // Click events
+    // Click dropdown
+    //$('.dropdown-item').click(function() {
+    //    var item = $(this);
+    //    var dropdown = item.parent();
+    //    var input = dropdown.prev()
+    //    dropdown.removeClass('show');
+    //    input.val(item.val()+'001');
+    //});
+    // Search bar
+    var searchbar = $("#searchbar")
+    searchbar.hide()
     // Search angle in top of this page
     $('.search-angle').click(function(){
         if($(this).css("transform") == 'none'){
             $(this).css("transform","rotate(180deg)");
-            // Add a searchbar
+            searchbar.show('fast',function(){
+                var classinput = $('#classSelect');
+                var tradecodeinput = $('#tradecodeSelect')
+                // when assets class input focus and use key event
+                var classkw = $.ajax({
+                    url:'{% url 'market:keywords' %}',
+                    type:'POST',
+                    dataType: 'json',
+                    data:{'infotable':['classinfo']},
+                    success:function(keywords){
+                        return keywords.keywords;
+                    }
+                });
+                var tckw = $.ajax({
+                    url:'{% url 'market:keywords' %}',
+                    type:'POST',
+                    dataType: 'json',
+                    data:{'infotable':['indexinfo','stockinfo']},
+                    success:function(keywords){
+                        return keywords.keywords;
+                    }
+                });
+                // Keyboard monitor for class input
+                keyboard_monitor(classkw,classinput);
+                // Keyboard monitor for trade code input
+                keyboard_monitor(tckw,tradecodeinput);
+                // Date select
+                $('#dateSelect').datepicker({
+                    todayBtn: "linked",
+                    clearBtn: true,
+                    language: "zh-CN",
+                    multidate: true,
+                    multidateSeparator: " ",
+                    daysOfWeekDisabled: "0,6"
+                });
 
+                tradecode = $('#tradecodeSelect')
+                date = $('#dateSelect')
+                // Click button
+                $('#search-btn').click(function(){
+                    $.ajax({
+                        type:'GET',
+                        url:'{% url 'market:index' %}',
+                        data:{
+                            'dateselected':date,
+                            'tradecodeselected':tradecode,
+                            'classselectd':classinput
+                        },
+                        success:function(data){
+                            refresh_cards()
+                        }
+                    });
+                });
+            });
             //
         }else{
             $(this).css("transform","");
+            searchbar.hide('fast',function(){});
         }
     })
     // Add more card
@@ -480,3 +487,5 @@ $(document).ready(function(){
 });
 </script>
 {% endblock %}
+
+id

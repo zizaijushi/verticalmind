@@ -10,6 +10,7 @@ import pandas as pd
 from django.db import connections
 from pymysql import connect,cursors
 from datetime import datetime,timedelta,date
+from xpinyin import Pinyin as pinyin
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
@@ -287,6 +288,32 @@ class indexView(indexMidToolsMixin,View):
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
+
+class keywordsView(indexMidToolsMixin,View):
+    def post(self, request, *args, **kwargs):
+        cursor = connections['default'].cursor()
+        infotable = request.POST.getlist('infotable[]')
+        if type(infotable) is not list:
+            infotable = [infotable]
+        infotable = "','".join(infotable)
+        if infotable is None:
+            sql = "SELECT TRADE_CODE,SEC_NAME,PINYIN,PINYIN_INIT,TRADE_CODE AS SYMBOL FROM market_basicinfo"
+        else:
+            sql = "SELECT TRADE_CODE,SEC_NAME,PINYIN,PINYIN_INIT,TRADE_CODE AS SYMBOL FROM market_basicinfo WHERE INFO_TABLE IN ('{}')".format(infotable)
+        cursor.execute(sql)
+        keywords = pd.DataFrame(dictfetchall(cursor))
+        temp = keywords[['TRADE_CODE','SYMBOL']].rename(columns = {'SYMBOL':'VALUE'})
+        colname = [x for x in list(keywords.columns.values) if x not in ['TRADE_CODE','SYMBOL']]
+        for n in colname:
+            temp = pd.concat([temp,keywords[['TRADE_CODE',n]].rename(columns = {n:'VALUE'})],axis=0)
+        keywords = temp.values.tolist()
+        cursor.close()
+        return JsonResponse({'keywords':keywords})
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
 
 class cleandataMixin:
     def pandas2jsonlist(self,table,dataCol = None,numCol = None, pctCol = None):

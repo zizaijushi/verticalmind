@@ -20,6 +20,7 @@ from . import views
 
 urlpatterns = [
     path("", views.indexView.as_view(), name = 'index'),
+    re_path(r"^keywords/$", views.keywordsView.as_view(), name = 'keywords'),
     re_path(r"^market/$", views.marketView.as_view(), name = 'market'),
     re_path(r"^obos/$",views.obosView.as_view(),name = "obos"),
     re_path(r"^volatility/$",views.volatilityView.as_view(),name = 'volatility'),
