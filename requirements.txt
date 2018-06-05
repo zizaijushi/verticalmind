@@ -5,3 +5,5 @@ PyMySQL ==	0.8.1
 django-imagekit == 4.0.2
 numpy ==	1.14.3	
 pandas ==	0.22.0	
+awesome-slugify == 1.6.5
+xpinyin == 0.5.5

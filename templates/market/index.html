@@ -376,8 +376,14 @@ function keyboard_monitor(data,input){
         }
         if ($.isNumeric(text) && text == 1){
             var dropdowninsert = '';
-            var inputval = input.val();
-            var candidates = data.filter(function (search) { return search.VALUE ==  inputval});
+            var inputval = input.val().toUpperCase();
+            var candidates = data.filter(
+                function (search) {
+                    //return search.VALUE.indexOf(inputval) != -1
+                    re = new RegExp('^'+inputval+'+');
+                    return re.test(search.VALUE)
+            });
+            candidates = candidates.slice(0,10)
 
             $('.dropdown-item').remove();
             $.each(candidates,function(idx,val){
@@ -438,11 +444,13 @@ $(document).ready(function(){
                     dataType: 'json',
                     data:{'infotable':['indexinfo','stockinfo']},
                     success:function(keywords){
-                        return keywords.keywords;
+                        keywords = keywords.keywords;
+                        keywords = $.parseJSON(keywords);
+                        // Keyboard monitor for class input
+                        keyboard_monitor(keywords,classinput);
                     }
                 });
-                // Keyboard monitor for class input
-                keyboard_monitor(classkw,classinput);
+
                 // Keyboard monitor for trade code input
                 keyboard_monitor(tckw,tradecodeinput);
                 // Date select
