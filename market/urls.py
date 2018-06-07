@@ -20,11 +20,9 @@ from . import views
 
 urlpatterns = [
     path("", views.indexView.as_view(), name = 'index'),
+    re_path(r"^minifullswitchswitch/$", views.minifullswitchView.as_view(), name = 'minifullswitch'),
     re_path(r"^keywords/$", views.keywordsView.as_view(), name = 'keywords'),
-    re_path(r"^market/$", views.marketView.as_view(), name = 'market'),
-    re_path(r"^obos/$",views.obosView.as_view(),name = "obos"),
-    re_path(r"^volatility/$",views.volatilityView.as_view(),name = 'volatility'),
-    re_path(r"^volatilityRow/$",views.volatilityRowView.as_view(),name = 'volatilityRow'),
+    re_path(r"^fund/?P<fundcode>\w+$",views.fund.as_view(),name = 'fund'),
     # path("glxu",views.glxu, name = 'glxu'),
     # path("bbzhang",views.bbzhang, name = 'bbzhang')
     # path('<str:TRADE_CODE>',views.detail),

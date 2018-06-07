@@ -61,18 +61,26 @@ Anomaly Section
                         <div class="section-card card searchbar" id="searchbar" style="display: none;">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-12 searchbar-items">
+                                    <div class="col-md-6 searchbar-items">
                                         <div class="input-group">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text">选择资产</span>
+                                                <span class="input-group-text">选择指标</span>
                                             </div>
-                                            <input type="text" class="form-control" id="classSelect">
-                                            <div class="dropdown-menu" id="classdropdown"></div>
+                                            <div class="keyboard-monitor" id="colnameSelect">
+                                                <input type="text" class="form-control">
+                                                <div class="dropdown-menu"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 searchbar-items">
+                                        <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">选择标的</span>
                                             </div>
-                                            <input type="text" class="form-control" id="tradecodeSelect">
-                                            <div class="dropdown-menu" id="tradedropdown"></div>
+                                            <div class="keyboard-monitor" id="tradecodeSelect">
+                                                <input type="text" class="form-control">
+                                                <div class="dropdown-menu"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -82,80 +90,82 @@ Anomaly Section
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">选择日期</span>
                                             </div>
-                                            <input type="text" class="form-control" id="dateSelect">
+                                            <div>
+                                                <input type="text" class="form-control" id="dateSelect">
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6 searchbar-items">
-                                        <button type="button" class="btn btn-info" style="float: right;">搜索</button>
+                                        <button type="button" class="btn btn-info" id="search-btn" style="float: right;">
+                                            搜索
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <span></span>
                         <div class="section-title-divider"></div>
                         <p class="section-description">每日17:30更新当日出现异动的数据，点击可查看该数据的详细信息。</p>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-body">
-                        <h4><i class="far fa-clock"></i> {{curdate}}</h4>
-                    </div>
-                </div>
 
                 {% for card in carddata %}
-                {% if card.1 == 1 %}
-                <div class="card">
+                {% if card.1 == 'date'%}
+                <div class="card anomaly">
+                    <div class="card-body">
+                        <h4><i class="far fa-clock"></i> {{ card.0}}</h4>
+                    </div>
+                </div>
+                {% elif card.1 == 'nodata' %}
+                <div class="card anomaly">
                     <div class="card-body">
                         <h4>{{card.0}}</h4>
                     </div>
                 </div>
                 {% else %}
-                <div class="card">
-                    <div class="row">
-                        <div class="col-md-9">
-                            <div id="card-chart-{{card.3}}" class="card-chart"></div>
-                            <script type="text/javascript">
-                                $(function() {card_chart('card-chart-{{card.3}}',{{card.0.0|safe}})})
-                                // $(function() {card_chart('card-chart-{{card.3}}',{{card.0.0|safe}})})
-                            </script>
-                        </div>
-                        <div class="col-md-3 card-body">
-                            <div class="card-body">
-                                <h5 class="card-title">{{card.0.1}}</h5>
-                                <p class="card-text">{{card.0.2}}</p>
-                                <!--<br>-->
-                                <button type="button" class="btn btn-info align-bottom"
-                                        onclick="chg_chart('{{card.3}}','{{curdate}}')"
-                                        id="card-button-{{card.3}}">查看详情</button>
-                                <p class="card-footer align-bottom align-text-bottom card-date"
-                                   style="font-size:9px">{{ curdate }}</p>
-                            </div>
-                        </div>
+                <!--<div class="card anomaly">-->
+                    <!--<div class="row">-->
+                        <!--<div class="col-md-9">-->
+                            <!--<div id="card-chart-{{card.3}}" class="card-chart"></div>-->
+                            <!--<script type="text/javascript">-->
+                                <!--$(function() {card_chart('card-chart-{{card.3}}',{{card.0.0|safe}})})-->
+                                <!--// $(function() {card_chart('card-chart-{{card.3}}',{{card.0.0|safe}})})-->
+                            <!--</script>-->
+                        <!--</div>-->
+                        <!--<div class="col-md-3 card-body">-->
+                            <!--<div class="card-body">-->
+                                <!--<h5 class="card-title">{{card.0.1}}</h5>-->
+                                <!--<p class="card-text">{{card.0.2}}</p>-->
+                                <!--&lt;!&ndash;<br>&ndash;&gt;-->
+                                <!--<button type="button" class="btn btn-info align-bottom"-->
+                                        <!--onclick="chg_chart('{{card.3}}','{{curdate}}')"-->
+                                        <!--id="card-button-{{card.3}}">查看详情</button>-->
+                                <!--<p class="card-footer align-bottom align-text-bottom card-date"-->
+                                   <!--style="font-size:9px">{{ curdate }}</p>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                {% endif %}
+                {% empty %}
+                <div class="card anomaly">
+                    <div class="card-body">
+                        <h4>抱歉...未请求到数据</h4>
                     </div>
                 </div>
-                {% endif %}
                 {% endfor %}
 
-                <button class="btn btn-outline-info btn-block" id="add-card" type="button" name="{{curdate}}">
+                <button class="btn btn-outline-info btn-block date" id="add-btn" type="button" name="{{curdate}}">
                     <h4 style="text-align:center;">加载更多日期....</h4>
                 </button>
             </div>
             <div class="col-md-2">
                 <nav class="navbar navbar-light bg-light" id="sider-nav" style="position: sticky;position: -webkit-sticky;top:150px;">
                     <nav class="nav nav-pills flex-column">
-                        <a class="nav-link" href="">复盘笔记</a>
+                        <a class="nav-link">复盘笔记</a>
                         <nav class="nav nav-pills flex-column">
-                            <a class="nav-link ml-3 my-1" href="">市场情绪</a>
-                            <a class="nav-link ml-3 my-1" href="">市场波动</a>
-                            <a class="nav-link ml-3 my-1" href="">市场热度</a>
-                            <a class="nav-link ml-3 my-1" href="">市场风格</a>
+                            <a class="nav-link ml-3 my-1">市场情绪</a>
                         </nav>
-                        <a class="nav-link" href="">最新数据</a>
-                        <nav class="nav nav-pills flex-column">
-                            <a class="nav-link ml-3 my-1" href="">商品/债期</a>
-                            <a class="nav-link ml-3 my-1" href="">隔夜利率</a>
-                            <a class="nav-link ml-3 my-1" href="">利差</a>
-                        </nav>
+                        <a class="nav-link">性感科学家了解一下</a>
                     </nav>
                 </nav>
             </div>
@@ -295,166 +305,255 @@ function chg_chart(rankid,date){
         });
     };
 };
-// Function for add more card
-function add_cards(lastdate,btn){
-    $.ajax({
-        type:'GET',
-        url:'{% url 'market:index' %}',
-        data:{'lastdate': lastdate},
-        success:function(data){
-            var carddata = data.carddata;
-            var curdate = data.curdate;
-
-            // Change add card button name
-            $('#add-card').attr('name', curdate);
-            $('#temp').remove();
-
-            // Create cards
-            newhtml =
-                '<div class="card">'+
-                    '<div class="card-body">'+
-                        '<h4><i class="far fa-clock"></i> '+curdate+'</h4>'+
-                    '</div>'+
-                '</div>'
-            $(newhtml).insertBefore( btn );
-
-            carddata.forEach(function(e){
-                if(e[1] == 1){
-                    newhtml =
-                        '<div class="card">'+
-                            '<div class="card-body">'+
-                                '<h4>'+e[0]+'</h4>'+
-                            '</div>'+
-                        '</div>'
-                }else{
-                    edate = "'"+curdate+"'"
-                    newhtml =
-                        '<div class="card">'+
-                            '<div class="row">'+
-                                '<div class="col-md-9">'+
-                                    '<div id="card-chart-'+e[3]+'" class="card-chart"></div>'+
-                                '</div>'+
-                                '<div class="col-md-3">'+
-                                    '<div class="card-body">'+
-                                        '<h5 class="card-title">'+e[0][1]+'</h5>'+
-                                        '<p class="card-text">'+e[0][2]+'</p><br>'+
-                                        '<button type="button" class="btn btn-info" '+
-                                        'onclick="chg_chart('+e[3]+','+edate+')" '+
-                                        'id="card-button-'+e[3]+'">查看详情</button>'+
-                                    '</div>'+
-                                '</div>'+
-                            '</div>'+
-                        '</div>'
-                }
-                $.when( $(newhtml).insertBefore( btn ) ).then( card_chart('card-chart-'+e[3],e[0][0]) );
-                //$(newhtml).insertBefore( btn );
-                //$(function(){card_chart('card-chart-'+e[3],e[0][0]);})
-            });
-        }
-    });
+// Unique multidimention array by one column
+function array_unique(array,colname){
+    var col = [];
+    for(n in array)
+        col.push(array[n][colname]);
+    return $.grep(array,function(el,index){
+        return index == $.inArray(el[colname],col);
+    })
 };
 // Keyboard monitor
-function keyboard_monitor(data,input){
+$.fn.keyboard_monitor = function(options){
+    var dom = this;
+    var input = dom.children().first();
     var dropdown = input.next();
+    var keywords = $(),recode = $();
+    var infotable = options && options.infotable;
+    var maxdropdown = options && options.maxdropdown;
+
+    // when assets class input focus and use key event
+    $.ajax({
+        url:'{% url 'market:keywords' %}',
+        type:'GET',
+        dataType: 'json',
+        data:{'infotable':options.infotable},
+        success:function(data){
+            keywords = $.parseJSON(data.keywords);
+            recode = $.parseJSON(data.recode);
+        }
+    });
 
     input.bind('keyup',function(e){
+        var dropdownitems = [],dropdowninsert = '';
+        var inputval = input.val().toUpperCase();
         var text = 0
+        //
         if (!dropdown.hasClass('show')){
             dropdown.addClass('show');
         }
-        // Get input value
+        $('.dropdown-item').remove();
+        // check input keycode
         if ((e.which>=48 && e.which<=57) || (e.which>=65 && e.which<=90) ||
-            e.which ==190 || e.which == 229){
-            text = 1;
-        }
-        if (e.which == 8){
-            text = 2;
-        }
-        if (e.which == 13){
-            $(this).blur();
-            //text = 0
-        }
-        if ($.isNumeric(text) && text == 1){
-            var dropdowninsert = '';
-            var inputval = input.val().toUpperCase();
-            var candidates = data.filter(
-                function (search) {
-                    //return search.VALUE.indexOf(inputval) != -1
-                    re = new RegExp('^'+inputval+'+');
-                    return re.test(search.VALUE)
-            });
-            candidates = candidates.slice(0,10)
-
-            $('.dropdown-item').remove();
-            $.each(candidates,function(idx,val){
+            e.which ==190 || e.which == 229 || e.which == 8){   // press letters or number or .
+            var candidates = $()
+            if (inputval == ''){
+                dropdownitems = [{TRADE_CODE:'',SEC_NAME:'空'}]
+            }else if(keywords.length == 0){
+                dropdownitems = [{TRADE_CODE:'',SEC_NAME:'数据正在加载'}]
+            }else{
+                candidates = keywords.filter(
+                    function (search) {
+                        //return search.VALUE.indexOf(inputval) != -1
+                        re = new RegExp('^'+inputval+'+');
+                        return re.test(search.VALUE);
+                });
+                // order optimize
+                candidates = candidates.slice(0,maxdropdown);
+                for(n in candidates){
+                    dropdownitems.push({TRADE_CODE:candidates[n].TRADE_CODE,SEC_NAME:candidates[n].SEC_NAME});
+                }
+                dropdownitems = array_unique(dropdownitems,'TRADE_CODE');
+                if(dropdownitems.length == 0){
+                    dropdownitems = [{TRADE_CODE:'',SEC_NAME:'无匹配'}]
+                }
+            }
+            $.each(dropdownitems,function(idx,val){
                 dropdowninsert = dropdowninsert+
-                    '<a class="dropdown-item" >'+val+'</a>';
+                    '<a class="dropdown-item" ><span class="secname">'+
+                    val.SEC_NAME + '</span><span class="tradecode">'+
+                    val.TRADE_CODE + '</span></a>';
             });
             dropdown.append(dropdowninsert);
-            // Click dropdown
-            $('.dropdown-item').click(function() {
-                var item = $(this);
-                var dropdown = item.parent();
-                var input = dropdown.prev();
+        }
+        if (e.which == 13){ // press Enter
+            $(this).blur();
 
+            dropdown.removeClass('show');
+        }
+        if (e.which == 40){ // press
+            text
+        }
+        // Click dropdown
+
+        $('.dropdown-item').click(function() {
+            var item = $(this);
+            var dropdown = item.parent();
+            var input = dropdown.prev();
+            var tradecode = item.children().last().text(),
+                secname = item.children().first().text()
+            dropdown.removeClass('show');
+            if(tradecode != ''){
+                input.val(secname);
+                input.attr('name',tradecode)
+            }
+        });
+    });
+    input.focusout(function(){
+        $(document).click(function(event){
+            if(!$(event.target).is(".dropdown-item")){
                 dropdown.removeClass('show');
-                input.val(item.text()+'001');
-            });
-        };
+            }
+        });
     });
 };
-//
-function refresh_cards(){
+// Function for add card befor a button
+$.fn.add_cards = function(options){
+    var carddata = options && options.carddata;
+    var date = options && options.date;
+    var num = options && options.num;
 
+    $('#temp').remove();
+
+    if(date.lenght == 1){
+        $('#add-btn').attr('name', date);      // Change add card button data
+        $('#add-btn').text('加载更多日期...')
+        // Create cards
+        newhtml =
+            '<div class="card anomaly">'+
+                '<div class="card-body">'+
+                    '<h4><i class="far fa-clock"></i> '+date+'</h4>'+
+                '</div>'+
+            '</div>'
+        $(newhtml).insertBefore( this );
+
+        carddata.forEach(function(e){
+            if(e[1] == 1){
+                newhtml =
+                    '<div class="card anomaly">'+
+                        '<div class="card-body">'+
+                            '<h4>'+e[0]+'</h4>'+
+                        '</div>'+
+                    '</div>'
+            }else{
+                edate = "'"+date+"'"
+                newhtml =
+                    '<div class="card anomaly">'+
+                        '<div class="row">'+
+                            '<div class="col-md-9">'+
+                                '<div id="card-chart-'+e[3]+'" class="card-chart"></div>'+
+                            '</div>'+
+                            '<div class="col-md-3">'+
+                                '<div class="card-body">'+
+                                    '<h5 class="card-title">'+e[0][1]+'</h5>'+
+                                    '<p class="card-text">'+e[0][2]+'</p><br>'+
+                                    '<button type="button" class="btn btn-info" '+
+                                    'onclick="chg_chart('+e[3]+','+edate+')" '+
+                                    'id="card-button-'+e[3]+'">查看详情</button>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'
+            }
+            $.when( $(newhtml).insertBefore( this ) ).then( card_chart('card-chart-'+e[3],e[0][0]) );
+            //$(newhtml).insertBefore( this );
+            //$(function(){card_chart('card-chart-'+e[3],e[0][0]);})
+        });
+    }
+    if(num.lenght == 1){
+        $('#add-btn').attr('name', date);      // Change add card button data
+        $('#add-btn').text('加载更多内容...');
+    }
 };
 
 // Main document
 $(document).ready(function(){
-    // Click dropdown
-    //$('.dropdown-item').click(function() {
-    //    var item = $(this);
-    //    var dropdown = item.parent();
-    //    var input = dropdown.prev()
-    //    dropdown.removeClass('show');
-    //    input.val(item.val()+'001');
-    //});
+    var searchbar = $("#searchbar");
+    var wait = '<div class="card" id="temp"><div class="card-body"><h4>请稍后...</h4></div></div>';
     // Search bar
-    var searchbar = $("#searchbar")
     searchbar.hide()
+
+    // Add more cards
+    $('#add-btn').click(function(){
+        var sig = addbtn.attr('name');
+        var colname,tradecode,date;
+        var options = [];
+
+        options.push({'sig' : sig});
+        if (searchbar.css('display') != 'none'){
+            colname = $('#colnameSelect').children().first().val();
+            tradecode = $('#tradecodeSelect').children().first().val();
+            date = $('#dateSelect').val();
+            options.push({'colname' : colname})；
+            options.push({'tradecode' : tradecode});
+            options.push({'date' : date});
+        }
+        $(wait).insertBefore( $(this) );
+        $.ajax({
+            type:'PUT',
+            url:'{% url 'market:index' %}',
+            data:JSON.stringify({'options': options}),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success:function(result){
+                $(this).add_cards({
+                    data: result.value
+                });
+            }
+        });
+    });
+
+    // Refeash cards
+    $('#search-btn').click(function(){
+        var colname,tradecode,date;
+        var options = [];
+
+        colname = $('#colnameSelect').children().first().val();
+        tradecode = $('#tradecodeSelect').children().first().val();
+        date = $('#dateSelect').val();
+        options.push({'colname' : colname})；
+        options.push({'tradecode' : tradecode});
+        options.push({'date' : date});
+
+        // remove exist cards
+        $.('.anomaly').remove()
+        $(wait).insertBefore( $('#add-btn') );
+        $.ajax({
+            type:'POST',
+            url:'{% url 'market:index' %}',
+            data:JSON.stringify({'options': options}),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success:function(data){
+                $('#add-btn').add_cards({
+                    data: result.value
+                });
+            }
+        });
+    });
+
     // Search angle in top of this page
     $('.search-angle').click(function(){
         if($(this).css("transform") == 'none'){
             $(this).css("transform","rotate(180deg)");
             searchbar.show('fast',function(){
-                var classinput = $('#classSelect');
+                var colnameinput = $('#colnameSelect');
                 var tradecodeinput = $('#tradecodeSelect')
-                // when assets class input focus and use key event
-                var classkw = $.ajax({
-                    url:'{% url 'market:keywords' %}',
-                    type:'POST',
-                    dataType: 'json',
-                    data:{'infotable':['classinfo']},
-                    success:function(keywords){
-                        return keywords.keywords;
-                    }
-                });
-                var tckw = $.ajax({
-                    url:'{% url 'market:keywords' %}',
-                    type:'POST',
-                    dataType: 'json',
-                    data:{'infotable':['indexinfo','stockinfo']},
-                    success:function(keywords){
-                        keywords = keywords.keywords;
-                        keywords = $.parseJSON(keywords);
-                        // Keyboard monitor for class input
-                        keyboard_monitor(keywords,classinput);
-                    }
-                });
+                var date = $('#dateSelect')
 
-                // Keyboard monitor for trade code input
-                keyboard_monitor(tckw,tradecodeinput);
+                // when assets class input focus and use key event
+                colnameinput.keyboard_monitor({
+                    infotable:[''],
+                    maxdropdown:10,
+                })
+                tradecodeinput.keyboard_monitor({
+                    infotable:['stockinfo','indexinfo'],
+                    maxdropdown:10,
+                })
+
                 // Date select
-                $('#dateSelect').datepicker({
+                date.datepicker({
                     todayBtn: "linked",
                     clearBtn: true,
                     language: "zh-CN",
@@ -462,40 +561,13 @@ $(document).ready(function(){
                     multidateSeparator: " ",
                     daysOfWeekDisabled: "0,6"
                 });
-
-                tradecode = $('#tradecodeSelect')
-                date = $('#dateSelect')
-                // Click button
-                $('#search-btn').click(function(){
-                    $.ajax({
-                        type:'GET',
-                        url:'{% url 'market:index' %}',
-                        data:{
-                            'dateselected':date,
-                            'tradecodeselected':tradecode,
-                            'classselectd':classinput
-                        },
-                        success:function(data){
-                            refresh_cards()
-                        }
-                    });
-                });
             });
             //
         }else{
             $(this).css("transform","");
             searchbar.hide('fast',function(){});
         }
-    })
-    // Add more card
-    $('#add-card').click(function(){
-        var btn = $(this);
-        var lastdate = btn.attr('name');
-        $('<div class="card" id="temp"><div class="card-body"><h4>请稍后...</h4></div></div>').insertBefore( btn );
-        add_cards(lastdate, btn);
     });
 });
 </script>
 {% endblock %}
-
-id

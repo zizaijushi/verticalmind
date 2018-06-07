@@ -1,0 +1,567 @@
+{% extends "base_market.html" %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <main class="container">
+        <div class="row">
+            <div class="col-sm-3 my-1">
+                <label for="fcode">请输入需要查看的基金代码：</label>
+            </div>
+            <div class="col-auto my-1">
+                <input type="text" class="form-control" id="fcode" value="163406.OF">
+            </div>
+            <div class="col-auto my-1">
+                <button type="button" id="btn" class="btn btn-outline-primary btn-sm">确定</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <!--<label> 基金基本信息及基金经理信息：</label>-->
+                <table id="Table_basic_info" class="display" width="100%">
+                    <thead>
+                    <tr>
+                        <th>基金代码</th>
+                        <th>基金名称</th>
+                        <th>基金成立日期</th>
+                        <th>基金投资类型</th>
+                    </tr>
+                    </thead>
+                </table>
+
+                <table id="Table_fm_info" class="display" width="100%">
+                    <thead>
+                    <tr>
+                        <th>基金代码</th>
+                        <th>基金经理</th>
+                        <th>任职日期</th>
+                        <th>任职以来年化收益率(%)</th>
+                    </tr>
+                    </thead>
+                </table>
+
+                <table id="Table_fm_cv" class="display" width="100%">
+                    <thead>
+                    <tr>
+                        <th>基金经理简历</th>
+                    </tr>
+                    </thead>
+                </table>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6" id="Chart_scale_unittotal" style="height:400px;width:100%"></div>
+            <div class="col-6" id="Chart_nav_mkt" style="height:400px;width:100%"></div>
+        </div>
+        <div class="row">
+            <div class="col-6" id="Chart_lastest_assets" style="height:400px;width:100%"></div>
+            <div class="col-6" id="Chart_lastest_stocks" style="height:400px;width:100%"></div>
+        </div>
+        <div class="row">
+            <div class="col-6" id="Chart_MDD" style="height:400px;width:100%"></div>
+            <div class="col-6">
+                <svg id="Chart_dist_log_yield" style="height:400px;width:100%"></svg>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6" id="Chart_a_b" style="height:400px;width:100%"></div>
+            <div class="col-6" id="Chart_style" style="height:400px;width:100%"></div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="http://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<style>
+td.details-control {
+    background: url('{% static 'img/details_open.png' %}') no-repeat center center;
+    cursor: pointer;
+}
+tr.shown td.details-control {
+    background: url('{% static 'img/details_close.png' %}') no-repeat center center;
+}
+.hc-chart{
+    height: 450px;
+    min-width: 310px;
+}
+</style>
+{% endblock %}
+
+{% block javascript %}
+{{block.super}}
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/histogram-bellcurve.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script src="{% static 'js/echarts.js'%}"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+function highchart_line_2xAxis(id,data0,data1,axis_text,title){
+    Highcharts.chart(id, {
+    chart: {
+        zoomType: 'xy'
+    },
+    title: {
+        text: title
+    },
+    subtitle: {
+        text: ''
+    },
+    xAxis: [{
+        type: 'datetime',
+        crosshair: true
+    }],
+    yAxis: [{ // Primary yAxis
+        labels: {
+            format: '{value}',
+            style: {
+                color: Highcharts.getOptions().colors[0]
+            },
+        },
+        title: {
+            text: axis_text[0],
+            style: {
+                color: Highcharts.getOptions().colors[0]
+            }
+        },
+        opposite: false
+
+    }, { // Secondary yAxis
+        gridLineWidth: 0,
+        title: {
+            text: axis_text[1],
+            style: {
+                color: Highcharts.getOptions().colors[1]
+            }
+        },
+        labels: {
+            format: '{value}',
+            style: {
+                color: Highcharts.getOptions().colors[1]
+            }
+        },
+        opposite: true
+    }],
+    tooltip: {
+        shared: true
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'left',
+        x: 80,
+        verticalAlign: 'top',
+        y: 55,
+        floating: true,
+        backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+    },
+    series: [{
+        name: axis_text[0],
+        type: 'spline',
+        yAxis: 0,
+        data: data0,
+        tooltip: {
+            valueSuffix: ''
+        }
+    }, {
+        name: axis_text[1],
+        type: 'spline',
+        yAxis: 1,
+        data: data1,
+        dashStyle: 'shortdot',
+        tooltip: {
+            valueSuffix: ''
+        }
+    }]
+})
+}
+
+function highchart_multi_lines(id,data0,data1,axis_text,type,title){
+    Highcharts.chart(id, {
+    chart: {
+        zoomType: 'xy'
+    },
+    title: {
+        text: title
+    },
+    subtitle: {
+        text: ''
+    },
+    xAxis: [{
+        type: 'datetime',
+        crosshair: true
+    }],
+    yAxis: [{
+        labels: {
+            format: '{value} %',
+            style: {
+                color: Highcharts.getOptions().colors[0]
+            },
+        },
+        title: {
+            text: '',
+            style: {
+                color: Highcharts.getOptions().colors[0]
+            }
+        },
+        opposite: false
+
+    }],
+    tooltip: {
+        shared: true
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'left',
+        x: 80,
+        verticalAlign: 'top',
+        y: 55,
+        floating: true,
+        backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+    },
+    series: [{
+        name: axis_text[0],
+        type: type,
+        data: data0,
+        tooltip: {
+            valueSuffix: ''
+        }
+    }, {
+        name: axis_text[1],
+        type: type,
+        data: data1,
+        tooltip: {
+            valueSuffix: ''
+        }
+    }]
+})
+}
+
+function highchart_multi_hist(id,data0,data1,axis_text,type,title){
+    Highcharts.chart(id, {
+    title: {
+        text: title
+    },
+    xAxis: [{
+        alignTicks: false
+    }],
+    yAxis: [{
+        title: {
+            text: ''
+        }
+    }],
+    series: [{
+        name: axis_text[0],
+        type: type,
+        data: data0
+    }, {
+        name: axis_text[1],
+        type: type,
+        data: data1
+    }]
+    })
+}
+
+function highchart_percent_area_style(id,data0,data1,axis_text,title){
+    Highcharts.chart(id, {
+        chart: {
+            type: 'area'
+        },
+        title: {
+            text: 'Historic and Estimated Worldwide Population Distribution by Region'
+        },
+        xAxis: {
+                type: 'datetime',
+            title: {
+                enabled: false
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Percent'
+            },
+            max: 100,
+            min: 0
+        },
+        tooltip: {
+            pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.percentage:.1f}%',
+            split: true
+        },
+        plotOptions: {
+            area: {
+                stacking: 'percent',
+                lineColor: '#ffffff',
+                lineWidth: 1,
+                marker: {
+                    lineWidth: 1,
+                    lineColor: '#ffffff'
+                }
+            }
+        },
+        series: [{
+            name: axis_text[0],
+            data: data0
+        }, {
+            name: axis_text[1],
+            data: data1
+        }]
+    });
+}
+
+function echart_pie(id,data,title){
+    var myChart = echarts.init(document.getElementById(id));
+
+    option = {
+        title : {
+            text: title,
+            subtext: '',
+            x:'center'
+        },
+        tooltip : {
+            trigger: 'item',
+            formatter: "{b} : {c} %"
+        },
+        series : [
+            {
+                name: '',
+                type: 'pie',
+                radius : '55%',
+                center: ['50%', '60%'],
+                data: data,
+                itemStyle: {
+                    emphasis: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+}
+
+function d3_density_histo(id,data){
+    var svg = d3.select(id),
+        width = $(id).width(),
+        height = $(id).height(),
+        margin = {top: 20, right: 30, bottom: 30, left: 40};
+
+    var x = d3.scaleLinear()
+        .domain([Math.min.apply(Math, data), Math.max.apply(Math, data)])
+        .range([margin.left, width - margin.right]);
+
+    var y = d3.scaleLinear()
+        .domain([0, .4])
+        .range([height - margin.bottom, margin.top]);
+
+    svg.append('g')
+        .attr('class', 'axis axis--x')
+        .attr('transform', 'translate(0,' + (height - margin.bottom) + ')')
+        .call(d3.axisBottom(x))
+        .append('text')
+        .attr('x', width - margin.right)
+        .attr('y', -6)
+        .attr('fill', '#000')
+        .attr('text-anchor', 'end')
+        .attr('font-weight', 'bold')
+        .text('年滚动收益率(log)');
+
+    svg.append('g')
+        .attr('class', 'axis axis--y')
+        .attr('transform', 'translate(' + margin.left + ',0)')
+        .call(d3.axisLeft(y).ticks(null, '%'));
+
+    var n = data.length,
+        bins = d3.histogram().domain(x.domain()).thresholds(40)(data),
+        density = kernelDensityEstimator(kernelGaussian(0), x.ticks(40))(data);
+
+    svg.insert('g', '*')
+        .attr('fill', '#bbb')
+      .selectAll('rect')
+      .data(bins)
+      .enter().append('rect')
+        .attr('x', function(d) { return x(d.x0) + 1; })
+        .attr('y', function(d) { return y(d.length / n); })
+        .attr('width', function(d) { return x(d.x1) - x(d.x0) - 1; })
+        .attr('height', function(d) { return y(0) - y(d.length / n); });
+
+    svg.append('path')
+        .datum(density)
+        .attr('fill', 'none')
+        .attr('stroke', '#000')
+        .attr('stroke-width', 1.5)
+        .attr('stroke-linejoin', 'round')
+        .attr('d',  d3.line()
+            .curve(d3.curveBasis)
+            .x(function(d) { return x(d[0]); })
+            .y(function(d) { return y(d[1]); }));
+
+    function kernelDensityEstimator(kernel, X) {
+      return function(V) {
+        return X.map(function(x) {
+          return [x, d3.mean(V, function(v) { return kernel(x - v); })];
+        });
+      };
+    }
+
+    function kernelGaussian(k) {
+      return function(x) {
+        return Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
+      };
+    }
+}
+
+function d3_density_histo_double_yaxis(id,data){
+
+    function mean(array) {
+        var num = 0;
+        for (var i = 0, l = array.length; i < l; i++) num += array[i];
+        return num / array.length;
+	}
+
+    var mu = mean(data);
+
+    var sigma_2 = mean(data.map(function(num) {
+			return Math.pow(num - mu, 2)
+			}));
+
+    d3.select(id).selectAll('svg').remove();
+    var svg = d3.select(id),
+        width = $(id).width(),
+        height = $(id).height(),
+        margin = {top: 20, right: 30, bottom: 30, left: 40};
+
+    var x = d3.scaleLinear()
+    .domain([Math.min.apply(Math, data), Math.max.apply(Math, data)])
+    .range([margin.left, width - margin.right]);
+
+    var yLeft = d3.scaleLinear()
+    .domain([0, .1])
+    .range([height - margin.bottom, margin.top]);
+
+    var yRight = d3.scaleLinear()
+    .domain([0, 1.2])
+    .range([height - margin.bottom, margin.top]);
+
+    svg.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + (height - margin.bottom) + ")")
+      .call(d3.axisBottom(x))
+      .append("text")
+      .attr("x", width - margin.right)
+      .attr("y", -6)
+      .attr("fill", "#000")
+      .attr("text-anchor", "end")
+      .attr("font-weight", "bold")
+      .text("年滚动收益率(log)");
+
+    svg.append("g")
+      .attr("class", "axis axis--yLeft")
+      .attr("transform", "translate(" + margin.left + ",0)")
+      .call(d3.axisLeft(yLeft).ticks(null, "%"));
+
+    svg.append("g")
+      .attr("class", "axis axis--yRight")
+      .attr("transform", "translate(" + (width - margin.right) + ",0)")
+      .call(d3.axisRight(yRight));
+
+    var n = data.length,
+        bins = d3.histogram().domain(x.domain()).thresholds(40)(data),
+        density = kernelDensityEstimator(kernelGaussian(mu,sigma_2), x.ticks(40))(data);
+
+    svg.insert("g", "*")
+      .attr("fill", "#bbb")
+      .selectAll("rect")
+      .data(bins)
+      .enter().append("rect")
+      .attr("x", function(d) { return x(d.x0) + 1; })
+      .attr("y", function(d) { return yLeft(d.length / n); })
+      .attr("width", function(d) { return x(d.x1) - x(d.x0) - 1; })
+      .attr("height", function(d) { return yLeft(0) - yLeft(d.length / n); });
+
+    svg.append("path")
+      .datum(density)
+      .attr("fill", "none")
+      .attr("stroke", "#000")
+      .attr("stroke-width", 1.5)
+      .attr("stroke-linejoin", "round")
+      .attr("d",  d3.line()
+            .curve(d3.curveBasis)
+            .x(function(d) { return x(d[0]); })
+            .y(function(d) { return yRight(d[1]); }));
+
+    function kernelDensityEstimator(kernel, X) {
+      return function(V) {
+        return X.map(function(x) {
+          return [x, d3.mean(V, function(v) { return kernel(x - v); })];
+        });
+      };
+    }
+
+    function kernelEpanechnikov(k) {
+      return function(v) {
+        return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
+      };
+    }
+
+    function kernelGaussian(mu,sigma_2) {
+      return function(x) {
+        return Math.exp(-(x-mu)*(x-mu)/2/sigma_2)/Math.sqrt(2*Math.PI*sigma_2);
+      };
+    }
+}
+
+$(document).ready(function(){
+    $('#btn').click(function () {
+        var code = $('#fcode')[0]['value'];
+        $.ajax({
+            url:'{% url 'market:FundSamp'%}',
+            type:'POST',
+            data:{'fcode':code},
+            success:function(data){
+                var table_basic_info = $('#Table_basic_info')
+                var table_fm_info = $('#Table_fm_info')
+                var table_fm_cv = $('#Table_fm_cv')
+
+                if($.fn.DataTable.isDataTable( '#Table_basic_info' ) == true) table_basic_info.DataTable().destroy()
+                if($.fn.DataTable.isDataTable( '#Table_fm_info' ) == true) table_fm_info.DataTable().destroy()
+                if($.fn.DataTable.isDataTable( '#Table_fm_cv' ) == true) table_fm_cv.DataTable().destroy()
+
+                table_basic_info.DataTable({
+                    data:data['basic_info_samp'],
+                    dom:'t'
+                });
+                table_fm_info.DataTable({
+                    data:data['fm_info_samp'],
+                    dom:'t'
+                });
+                table_fm_cv.DataTable({
+                    data:data['fm_cv_samp'],
+                    dom:'t'
+                });
+
+                highchart_line_2xAxis('Chart_scale_unittotal',data['scale_unit_samp']['fund_scale'],data['scale_unit_samp']['fund_unittotal'],['资产规模(亿)','基金份额(亿)'],'基金资产规模与份额走势');
+                highchart_line_2xAxis('Chart_nav_mkt',data['nav_mkt_samp']['fund_nav'],data['nav_mkt_samp']['fund_mkt'],['复权单位净值','复权单位净值/万得全A'],'复权单位净值走势');
+                echart_pie('Chart_lastest_assets',data['lastest_details_assets_samp'],'当前季度资产配置明细');
+                echart_pie('Chart_lastest_stocks',data['lastest_details_stocks_samp'],'当前季度前十重仓股票占资产净值比');
+                highchart_multi_lines('Chart_MDD',data['MDD_samp']['fund_MDD_samp'],data['MDD_samp']['fund_MDD_mean'],['该基金','该类基金平均'],'spline','最大回撤(日,季度)');
+                //highchart_multi_hist('Chart_dist_log_yield',data['dist_log_yield_samp']['log_yield_fund'],data['dist_log_yield_samp']['log_yield_mkt'],['该基金','万得全A'],'histogram','年滚动收益率(log)')
+                d3_density_histo_double_yaxis('#Chart_dist_log_yield',data['dist_log_yield_samp']['log_yield_fund']);
+                highchart_line_2xAxis('Chart_a_b',data['a_b_samp']['fund_a'],data['a_b_samp']['fund_b'],['Alpha','Beta'],'Alpha,Beta(周,季度)')
+                highchart_percent_area_style('Chart_style',data['style_samp']['fund_GROWTH'],data['style_samp']['fund_VALUE'],['GROWTH','VALUE'],'风格(周,季度)')
+            }
+        })
+    })
+})
+</script>
+{% endblock %}

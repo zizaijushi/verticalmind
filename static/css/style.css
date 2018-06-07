@@ -915,3 +915,25 @@ function card_chart_redraw(id,options){
     options = $.extend(options, new_options)
     Highcharts.stockChart(id, options);
 };
+
+/*--------------------------------------------------------------
+# Keyboard monitor
+--------------------------------------------------------------*/
+.keyboard-monitor {
+    position: relative;
+}
+/*
+.keyboard-monitor .dropdown-menu {
+    position: absolute;
+    border: 1px solid red;
+    display: none;
+    z-index: 1;
+}
+*/
+
+.keyboard-monitor .dropdown-item .tradecode{
+    float: right;
+    text-align: right;
+    color: #696969;
+    margin-left: 5px;
+}
