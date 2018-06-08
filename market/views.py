@@ -580,21 +580,25 @@ class getdataFundSampMixin():
 
 class fund(getdataFundSampMixin,View):
     template_name = "market/fund.html"
-    def get(self, request, *args, **kwargs):
-        samp_code = self.request.GET.get('fundcode')
+
+    def get(self,request, *args, **kwargs):
+        return render(request,'market/fund.html',context={'data':1})
+    def post(self, request, *args, **kwargs):
+        # samp_code = self.kwargs['fundcode']
+        samp_code = request.POST.get('fcode')
 
         # samp_code = request.GET.get('fcode')
-        basic_info_samp = getdataFundSampMixin.get_fundinfo(samp_code)
-        fm_info_samp = getdataFundSampMixin.get_fm_info(samp_code)
-        fm_cv_samp = getdataFundSampMixin.get_fm_cv(samp_code)
-        scale_unit_samp = getdataFundSampMixin.get_fund_scale_unit(samp_code)
-        nav_mkt_samp = getdataFundSampMixin.get_fund_nav_mkt(samp_code)
-        lastest_details_assets_samp = getdataFundSampMixin.get_fund_details_assets(samp_code)
-        lastest_details_stocks_samp = getdataFundSampMixin.get_fund_details_stocks(samp_code)
-        MDD_samp = getdataFundSampMixin.get_fund_MDD(samp_code)
-        dist_log_yield_samp = getdataFundSampMixin.get_fund_dist_log_yield(samp_code)
-        a_b_samp = getdataFundSampMixin.get_fund_a_b(samp_code)
-        style_samp = getdataFundSampMixin.fund_reg(samp_code)
+        basic_info_samp = getdataFundSampMixin.get_fundinfo(self,samp_code)
+        fm_info_samp = getdataFundSampMixin.get_fm_info(self,samp_code)
+        fm_cv_samp = getdataFundSampMixin.get_fm_cv(self,samp_code)
+        scale_unit_samp = getdataFundSampMixin.get_fund_scale_unit(self,samp_code)
+        nav_mkt_samp = getdataFundSampMixin.get_fund_nav_mkt(self,samp_code)
+        lastest_details_assets_samp = getdataFundSampMixin.get_fund_details_assets(self,samp_code)
+        lastest_details_stocks_samp = getdataFundSampMixin.get_fund_details_stocks(self,samp_code)
+        MDD_samp = getdataFundSampMixin.get_fund_MDD(self,samp_code)
+        dist_log_yield_samp = getdataFundSampMixin.get_fund_dist_log_yield(self,samp_code)
+        a_b_samp = getdataFundSampMixin.get_fund_a_b(self,samp_code)
+        style_samp = getdataFundSampMixin.fund_reg(self,samp_code)
         return JsonResponse({'basic_info_samp': basic_info_samp,
                              'fm_info_samp': fm_info_samp,
                              'fm_cv_samp': fm_cv_samp,

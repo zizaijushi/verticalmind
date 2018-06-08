@@ -1,8 +1,8 @@
-{% extends "base_market.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container">
-    <main class="container">
+<section id="anomaly">
+    <div class="container wow fadeInUp">
         <div class="row">
             <div class="col-sm-3 my-1">
                 <label for="fcode">请输入需要查看的基金代码：</label>
@@ -67,12 +67,17 @@
             <div class="col-6" id="Chart_a_b" style="height:400px;width:100%"></div>
             <div class="col-6" id="Chart_style" style="height:400px;width:100%"></div>
         </div>
-    </main>
-</div>
+    </div>
+</section>
+
 {% endblock %}
 
 {% block css %}
 {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
 <link href="http://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 <style>
@@ -90,7 +95,7 @@ tr.shown td.details-control {
 </style>
 {% endblock %}
 
-{% block javascript %}
+{% block js %}
 {{block.super}}
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
 <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
@@ -523,9 +528,9 @@ function d3_density_histo_double_yaxis(id,data){
 
 $(document).ready(function(){
     $('#btn').click(function () {
-        var code = $('#fcode')[0]['value'];
+        var code = $('#fcode').val()
         $.ajax({
-            url:'{% url 'market:FundSamp'%}',
+            url:'{% url 'market:fund' %}',
             type:'POST',
             data:{'fcode':code},
             success:function(data){
